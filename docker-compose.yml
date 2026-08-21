@@ -1,0 +1,23 @@
+services:
+  web:
+    build: .
+    image: bernhackt-evoting:latest
+    container_name: bernhackt-evoting
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18140:80"
+
+  api:
+    build: ./server
+    image: bernhackt-evoting-api:latest
+    container_name: bernhackt-evoting-api
+    restart: unless-stopped
+    environment:
+      - OPENAI_REALTIME_KEY=${OPENAI_REALTIME_KEY}
+      - REALTIME_MODEL=${REALTIME_MODEL:-gpt-realtime}
+      - REALTIME_VOICE=${REALTIME_VOICE:-marin}
+      - PER_IP_PER_MIN=3
+      - PER_IP_PER_HOUR=12
+      - GLOBAL_PER_DAY=300
+    ports:
+      - "127.0.0.1:18142:8080"

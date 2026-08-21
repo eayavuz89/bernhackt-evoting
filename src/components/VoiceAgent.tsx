@@ -1,0 +1,307 @@
+import { useEffect, useRef, useState } from "react";
+import { useA11y } from "../AccessibilityContext";
+import { voiceBridge } from "../voiceBridge";
+
+type Status = "idle" | "connecting" | "live" | "error";
+const SESSION_MAX_MS = 180_000; // 3 min hard cap (cost control)
+const CALLS_URL = "https://api.openai.com/v1/realtime/calls";
+
+interface Line {
+  role: "user" | "assistant";
+  text: string;
+}
+
+export default function VoiceAgent() {
+  const a = useA11y();
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+  const [lines, setLines] = useState<Line[]>([]);
+  const [needsUnlock, setNeedsUnlock] = useState(false); // autoplay blocked → user must tap
+
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const dcRef = useRef<RTCDataChannel | null>(null);
+  const micRef = useRef<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const timerRef = useRef<number | null>(null);
+  const partial = useRef<{ user: string; assistant: string }>({ user: "", assistant: "" });
+
+  useEffect(() => () => hangup(), []); // cleanup on unmount
+
+  function pushFinal(role: "user" | "assistant", text: string) {
+    const t = text.trim();
+    if (!t) return;
+    setLines((prev) => [...prev.slice(-8), { role, text: t }]);
+  }
+
+  function handleEvent(evt: any) {
+    switch (evt.type) {
+      // live captions (deltas) — accessibility for deaf/hard-of-hearing users
+      case "response.output_audio_transcript.delta":
+        partial.current.assistant += evt.delta || "";
+        break;
+      case "response.output_audio_transcript.done":
+        pushFinal("assistant", evt.transcript || partial.current.assistant);
+        partial.current.assistant = "";
+        break;
+      case "conversation.item.input_audio_transcription.delta":
+        partial.current.user += evt.delta || "";
+        break;
+      case "conversation.item.input_audio_transcription.completed":
+        pushFinal("user", evt.transcript || partial.current.user);
+        partial.current.user = "";
+        break;
+      // tool calls
+      case "response.function_call_arguments.done":
+        executeTool(evt.name, evt.call_id, evt.arguments);
+        break;
+      case "error":
+        console.error("[voice] realtime error", evt.error);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function executeTool(name: string, callId: string, argsJson: string) {
+    let args: any = {};
+    try {
+      args = argsJson ? JSON.parse(argsJson) : {};
+    } catch {
+      /* ignore */
+    }
+    const result = voiceBridge.run(name, args);
+    const dc = dcRef.current;
+    if (!dc || dc.readyState !== "open") return;
+    dc.send(
+      JSON.stringify({
+        type: "conversation.item.create",
+        item: { type: "function_call_output", call_id: callId, output: JSON.stringify(result) },
+      })
+    );
+    dc.send(JSON.stringify({ type: "response.create" }));
+  }
+
+  async function start() {
+    // Unlock audio output WHILE we still have the tap's user-gesture (critical on
+    // mobile Chrome): resume an AudioContext and nudge the <audio> element now,
+    // before any network await drops the gesture context.
+    try {
+      const AC: any = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (AC) {
+        audioCtxRef.current = audioCtxRef.current || new AC();
+        audioCtxRef.current.resume().catch(() => {});
+      }
+      audioRef.current?.play?.().catch(() => {});
+    } catch {
+      /* ignore */
+    }
+
+    setError("");
+    setLines([]);
+    setStatus("connecting");
+    setOpen(true);
+    try {
+      // 1) ephemeral token from our backend
+      const tr = await fetch("/api/realtime/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lang: a.lang }),
+      });
+      if (!tr.ok) {
+        const j = await tr.json().catch(() => ({}));
+        throw new Error(tr.status === 429 ? a.tr("voiceBusy") : j.error || "token_error");
+      }
+      const { value: ephemeral } = await tr.json();
+      if (!ephemeral) throw new Error("no_token");
+
+      // 2) mic
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micRef.current = mic;
+
+      // 3) peer connection
+      const pc = new RTCPeerConnection();
+      pcRef.current = pc;
+
+      // Remote model audio arrives here — attach to the <audio> and force playback.
+      // Autoplay of audible media can be blocked; if so we surface an unlock button.
+      const remote = new MediaStream();
+      pc.ontrack = (e) => {
+        (e.streams[0] ? e.streams[0].getTracks() : [e.track]).forEach((t) => remote.addTrack(t));
+        const el = audioRef.current;
+        if (!el) return;
+        el.srcObject = remote;
+        el.muted = false;
+        el.volume = 1;
+        el.play().then(
+          () => setNeedsUnlock(false),
+          () => setNeedsUnlock(true) // browser blocked autoplay → show "enable sound"
+        );
+      };
+      // addTrack creates a sendrecv transceiver → we both send mic and receive model audio.
+      mic.getTracks().forEach((tr2) => pc.addTrack(tr2, mic));
+
+      pc.onconnectionstatechange = () => {
+        const st = pc.connectionState;
+        if (st === "failed" || st === "disconnected") {
+          setError(a.tr("voiceError"));
+        }
+      };
+
+      // 4) data channel for events + tool calls
+      const dc = pc.createDataChannel("oai-events");
+      dcRef.current = dc;
+      dc.onmessage = (e) => {
+        try {
+          handleEvent(JSON.parse(e.data));
+        } catch {
+          /* ignore */
+        }
+      };
+      dc.onopen = () => {
+        // greet + kick off the flow
+        dc.send(
+          JSON.stringify({
+            type: "response.create",
+            response: {
+              instructions:
+                "Begrüsse die Person kurz und warm auf Deutsch als Sprach-Assistentin Vera. " +
+                "Sag, dass du beim Abstimmen hilfst. Rufe dann get_state auf und leite die Person durch den nächsten Schritt.",
+            },
+          })
+        );
+      };
+
+      // 5) SDP offer -> OpenAI, apply answer
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      const sdpRes = await fetch(CALLS_URL, {
+        method: "POST",
+        body: offer.sdp,
+        headers: { Authorization: `Bearer ${ephemeral}`, "Content-Type": "application/sdp" },
+      });
+      if (!sdpRes.ok) throw new Error("webrtc_setup");
+      const answer = { type: "answer" as const, sdp: await sdpRes.text() };
+      await pc.setRemoteDescription(answer);
+
+      setStatus("live");
+      timerRef.current = window.setTimeout(() => hangup(true), SESSION_MAX_MS);
+    } catch (e: any) {
+      console.error("[voice] start failed", e);
+      const msg =
+        e?.name === "NotAllowedError"
+          ? a.tr("voiceMicDenied")
+          : e?.message === a.tr("voiceBusy")
+          ? a.tr("voiceBusy")
+          : a.tr("voiceError");
+      setError(msg);
+      setStatus("error");
+      cleanup();
+    }
+  }
+
+  function cleanup() {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    dcRef.current?.close();
+    dcRef.current = null;
+    pcRef.current?.getSenders()?.forEach((s) => s.track?.stop());
+    pcRef.current?.close();
+    pcRef.current = null;
+    micRef.current?.getTracks().forEach((t) => t.stop());
+    micRef.current = null;
+    if (audioRef.current) audioRef.current.srcObject = null;
+    setNeedsUnlock(false);
+  }
+
+  function hangup(capped = false) {
+    cleanup();
+    setStatus("idle");
+    if (capped) setError(a.tr("voiceCapped"));
+  }
+
+  const live = status === "live";
+  const connecting = status === "connecting";
+
+  return (
+    <>
+      <audio ref={audioRef} autoPlay playsInline />
+
+      {/* Floating launcher */}
+      <button
+        type="button"
+        className={"voice-fab" + (live ? " live" : "")}
+        aria-expanded={open}
+        aria-label={a.tr("voiceAssistant")}
+        onClick={() => (status === "idle" || status === "error" ? start() : setOpen((o) => !o))}
+      >
+        <span aria-hidden="true">🎙️</span>
+        <span className="voice-fab-text">{a.tr("voiceAssistant")}</span>
+      </button>
+
+      {open && (
+        <div className="voice-panel" role="dialog" aria-label={a.tr("voiceAssistant")}>
+          <div className="voice-panel-head">
+            <span className={"voice-dot " + status} aria-hidden="true" />
+            <strong>
+              {connecting ? a.tr("voiceConnecting") : live ? a.tr("voiceListening") : a.tr("voiceAssistant")}
+            </strong>
+            <button type="button" className="voice-x" onClick={() => setOpen(false)} aria-label={a.tr("close")}>
+              ✕
+            </button>
+          </div>
+
+          {error ? (
+            <p className="voice-error" role="alert">
+              ⚠️ {error}
+            </p>
+          ) : (
+            <p className="voice-hint">{live ? a.tr("voiceSpeakNow") : a.tr("voiceIntro")}</p>
+          )}
+
+          {needsUnlock && (
+            <button
+              type="button"
+              className="btn btn-primary voice-unlock"
+              onClick={() =>
+                audioRef.current
+                  ?.play()
+                  .then(() => setNeedsUnlock(false))
+                  .catch(() => {})
+              }
+            >
+              🔊 {a.tr("voiceEnableSound")}
+            </button>
+          )}
+
+          <div className="voice-transcript" aria-live="polite" aria-label={a.tr("voiceTranscript")}>
+            {lines.length === 0 ? (
+              <p className="voice-empty">{a.tr("voiceTranscriptEmpty")}</p>
+            ) : (
+              lines.map((l, i) => (
+                <p key={i} className={"vt-line vt-" + l.role}>
+                  <span className="vt-who">{l.role === "user" ? "🗣️" : "🤖"}</span> {l.text}
+                </p>
+              ))
+            )}
+          </div>
+
+          <div className="voice-actions">
+            {live || connecting ? (
+              <button type="button" className="btn btn-ghost" onClick={() => hangup()}>
+                ⏹ {a.tr("voiceStop")}
+              </button>
+            ) : (
+              <button type="button" className="btn btn-primary" onClick={start}>
+                🎙️ {a.tr("voiceStart")}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
