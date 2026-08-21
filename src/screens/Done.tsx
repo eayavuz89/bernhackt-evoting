@@ -28,7 +28,9 @@ export default function Done({ session }: { session: Session }) {
       </div>
 
       <div className="finalize">
-        <span className="verify-code-label">{a.tr("finalizeCode")}</span>
+        <span className="verify-code-label">
+          <span className="sym" aria-hidden="true">★</span> {a.tr("finalizeCode")}
+        </span>
         <span className="code-badge code-badge-lg">{CARD.finalizeCode}</span>
       </div>
 

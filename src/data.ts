@@ -24,7 +24,7 @@ export const PROPOSALS: Proposal[] = [
       it: "Volete accettare l'iniziativa?",
       en: "Do you want to accept the initiative?",
     },
-    codes: { yes: "72 41", no: "18 06", blank: "55 90" },
+    codes: { yes: "1855", no: "0196", blank: "7064" },
   },
   {
     id: "p2",
@@ -40,7 +40,7 @@ export const PROPOSALS: Proposal[] = [
       it: "Volete accettare la modifica di legge?",
       en: "Do you want to accept the legal amendment?",
     },
-    codes: { yes: "34 88", no: "90 12", blank: "61 47" },
+    codes: { yes: "8393", no: "2938", blank: "2033" },
   },
   {
     id: "p3",
@@ -56,18 +56,28 @@ export const PROPOSALS: Proposal[] = [
       it: "Volete accettare l'oggetto?",
       en: "Do you want to accept the proposal?",
     },
-    codes: { yes: "07 63", no: "42 29", blank: "88 15" },
+    codes: { yes: "9697", no: "9131", blank: "7973" },
   },
 ];
 
 // Codes printed on the sample voting card (Stimmrechtsausweis).
+// Formats follow the official Swiss Post scheme (challenge briefing):
+// alphanumeric init code in 6 blocks, 9-digit confirmation, 8-digit finalization,
+// 4-digit choice return codes. The birth year is the Extended Authentication
+// Factor — deliberately NOT printed on the card (something you know).
 export const CARD = {
   name: "Muster, Maria",
   municipality: "Bern",
   voteDate: "28.09.2026",
-  initCode: "482 917 305",
-  confirmCode: "649 130",
-  finalizeCode: "TIGER-2027",
+  votePeriod: "Montag, 31.08.2026, 17:00 bis Sonntag, 28.09.2026, 12:00 (MEZ)",
+  portalUrl: "https://evoting.eayavuz.com",
+  fingerprint:
+    "AC 03 03 58 89 E9 19 18 75 9C 60 6B 0D 42 A0 AD 61 E2 73 F3 81 A9 74 15 E4 62 9D 28 54 DA 69 13",
+  birthYear: "1980",
+  initCode: "2r61 3gfn dfgq gy7j q4q6 aqq8",
+  confirmCode: "4419 7199 7",
+  finalizeCode: "4137 6763",
+  support: "evoting.eayavuz.com · support@post.ch",
 };
 
 export type Answer = "yes" | "no" | "blank";

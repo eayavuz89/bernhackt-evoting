@@ -26,7 +26,9 @@ export default function Confirm({ session }: { session: { answers: Record<string
     <Screen title={a.tr("confirmTitle")} help={a.tr("confirmHelp")} step={4} totalSteps={4}>
       <form className="form" onSubmit={submit} noValidate>
         <div className="field">
-          <label htmlFor="confirmCode">{a.tr("confirmCode")}</label>
+          <label htmlFor="confirmCode">
+            <span className="sym" aria-hidden="true">⬟</span> {a.tr("confirmCode")}
+          </label>
           <input
             id="confirmCode"
             className="input input-code"

@@ -36,7 +36,9 @@ export default function Verify({ session }: { session: Session }) {
                 </div>
               </div>
               <div className="verify-code">
-                <span className="verify-code-label">{a.tr("returnCode")}</span>
+                <span className="verify-code-label">
+                  <span className="sym" aria-hidden="true">◆</span> {a.tr("returnCode")}
+                </span>
                 <span className="code-badge" aria-label={`${a.tr("returnCode")}: ${code.split("").join(" ")}`}>
                   {code}
                 </span>

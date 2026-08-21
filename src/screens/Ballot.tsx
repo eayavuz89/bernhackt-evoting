@@ -11,6 +11,7 @@ export default function Ballot({ session }: { session: Session }) {
   const a = useA11y();
   const nav = useNavigate();
   const [error, setError] = useState("");
+  const [showEncrypt, setShowEncrypt] = useState(false);
 
   const proceed = () => {
     const unanswered = PROPOSALS.filter((p) => !session.answers[p.id]);
@@ -19,7 +20,9 @@ export default function Ballot({ session }: { session: Session }) {
       return;
     }
     setError("");
-    nav("/verify");
+    // Official flow: explicit "encrypt and submit" consent before return codes.
+    setShowEncrypt(true);
+    if (a.readAloud) a.speak(`${a.tr("encryptTitle")} ${a.tr("encryptBody")}`);
   };
 
   return (
@@ -77,6 +80,42 @@ export default function Ballot({ session }: { session: Session }) {
           ← {a.tr("back")}
         </Link>
       </div>
+
+      {showEncrypt && (
+        <div className="dialog-backdrop" role="presentation" onClick={() => setShowEncrypt(false)}>
+          <div
+            className="dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="encTitle"
+            aria-describedby="encBody"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="encTitle" className="dialog-title">
+              🔒 {a.tr("encryptTitle")}
+            </h2>
+            <p id="encBody" className="dialog-body">
+              {a.tr("encryptBody")}
+            </p>
+            <div className="dialog-actions">
+              <button type="button" className="btn btn-ghost" onClick={() => setShowEncrypt(false)}>
+                {a.tr("encryptCancel")}
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                autoFocus
+                onClick={() => {
+                  setShowEncrypt(false);
+                  nav("/verify");
+                }}
+              >
+                🔒 {a.tr("encryptOk")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Screen>
   );
 }
