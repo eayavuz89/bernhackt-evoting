@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { useA11y, Profile } from "../AccessibilityContext";
+import { useA11y, Profile } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
 
 const CARDS: { p: Profile; icon: string }[] = [

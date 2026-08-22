@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useA11y } from "../AccessibilityContext";
+import { useA11y } from "../context/AccessibilityContext";
 
 interface Props {
   title: string;

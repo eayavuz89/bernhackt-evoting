@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
-import { useA11y } from "../AccessibilityContext";
-import { CARD, PROPOSALS } from "../data";
+import { useA11y } from "../context/AccessibilityContext";
+import { CARD, PROPOSALS } from "../lib/data";
 
 // Barrier-free Stimmrechtsausweis following the official Swiss Post card
 // structure (briefing PDF): election period, portal URL + SHA-256 fingerprint,

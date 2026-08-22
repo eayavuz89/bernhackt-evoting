@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useA11y, Profile } from "../AccessibilityContext";
-import { LANGS, Lang } from "../i18n";
+import { useA11y, Profile } from "../context/AccessibilityContext";
+import { LANGS, Lang } from "../lib/i18n";
 import Dropdown from "./Dropdown";
 
 const PROFILES: Profile[] = ["standard", "blind", "motor", "cognitive", "senior"];

@@ -58,7 +58,11 @@ app.post("/api/realtime/token", async (req, res) => {
   const gate = allow(ip);
   if (!gate.ok) return res.status(429).json({ error: gate.reason });
 
-  const lang = typeof req.body?.lang === "string" ? req.body.lang : "de";
+  // Whitelist the UI language before it ever reaches the model instructions —
+  // it is interpolated into Vera's system prompt, so an unchecked value is a
+  // prompt-injection vector.
+  const ALLOWED_LANGS = new Set(["de", "fr", "it", "en"]);
+  const lang = ALLOWED_LANGS.has(req.body?.lang) ? req.body.lang : "de";
 
   try {
     const r = await fetch("https://api.openai.com/v1/realtime/client_secrets", {

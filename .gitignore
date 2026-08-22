@@ -4,3 +4,7 @@ dist
 *.log
 .env
 server/node_modules
+
+# OS / editor cruft
+.DS_Store
+.playwright-mcp

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useA11y } from "../AccessibilityContext";
-import { voiceBridge } from "../voiceBridge";
+import { useA11y } from "../context/AccessibilityContext";
+import { voiceBridge } from "../lib/voiceBridge";
 
 type Status = "idle" | "connecting" | "live" | "error";
 const SESSION_MAX_MS = 180_000; // 3 min hard cap (cost control)

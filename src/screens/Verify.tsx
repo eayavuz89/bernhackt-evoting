@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useA11y } from "../AccessibilityContext";
+import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
-import { PROPOSALS } from "../data";
-import type { Session } from "../App";
+import { PROPOSALS } from "../lib/data";
+import type { Session } from "../lib/types";
 
 export default function Verify({ session }: { session: Session }) {
   const a = useA11y();

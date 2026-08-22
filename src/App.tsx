@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Toolbar from "./components/Toolbar";
 import VoiceAgent from "./components/VoiceAgent";
-import { useA11y } from "./AccessibilityContext";
+import { useA11y } from "./context/AccessibilityContext";
 import ProfileSelect from "./screens/ProfileSelect";
 import Login from "./screens/Login";
 import Ballot from "./screens/Ballot";
@@ -10,14 +10,9 @@ import Verify from "./screens/Verify";
 import Confirm from "./screens/Confirm";
 import Done from "./screens/Done";
 import VotingCard from "./screens/VotingCard";
-import { Answer, PROPOSALS, CARD } from "./data";
-import { voiceBridge } from "./voiceBridge";
-
-export interface Session {
-  answers: Record<string, Answer>;
-  setAnswer: (id: string, a: Answer) => void;
-  reset: () => void;
-}
+import { Answer, PROPOSALS, CARD } from "./lib/data";
+import { voiceBridge } from "./lib/voiceBridge";
+import type { Session } from "./lib/types";
 
 const STEP_ORDER = ["/login", "/ballot", "/verify", "/confirm", "/done"];
 

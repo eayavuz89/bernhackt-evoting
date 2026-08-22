@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useA11y } from "../AccessibilityContext";
+import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
-import { CARD } from "../data";
+import { CARD } from "../lib/data";
 
 const EXPECTED = CARD.confirmCode.replace(/\s/g, ""); // "649130"
 

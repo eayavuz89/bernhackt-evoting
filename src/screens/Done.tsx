@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useA11y } from "../AccessibilityContext";
+import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
-import { CARD } from "../data";
-import type { Session } from "../App";
+import { CARD } from "../lib/data";
+import type { Session } from "../lib/types";
 
 export default function Done({ session }: { session: Session }) {
   const a = useA11y();

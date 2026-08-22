@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { useA11y } from "../AccessibilityContext";
+import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
-import { CARD } from "../data";
+import { CARD } from "../lib/data";
 
 // Official scheme: init code is alphanumeric, case-insensitive; the Extended
 // Authentication Factor (year of birth) is deliberately not on the card.

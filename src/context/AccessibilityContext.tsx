@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
-import { Lang, t } from "./i18n";
+import { Lang, t } from "../lib/i18n";
 
 export type Profile = "standard" | "blind" | "motor" | "cognitive" | "senior";
 

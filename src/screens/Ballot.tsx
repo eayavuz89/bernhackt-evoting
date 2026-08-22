@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useA11y } from "../AccessibilityContext";
+import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
-import { PROPOSALS, Answer } from "../data";
-import type { Session } from "../App";
+import { PROPOSALS, Answer } from "../lib/data";
+import type { Session } from "../lib/types";
 
 const OPTIONS: Answer[] = ["yes", "no", "blank"];
 
@@ -12,6 +12,8 @@ export default function Ballot({ session }: { session: Session }) {
   const nav = useNavigate();
   const [error, setError] = useState("");
   const [showEncrypt, setShowEncrypt] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const proceed = () => {
     const unanswered = PROPOSALS.filter((p) => !session.answers[p.id]);
@@ -24,6 +26,47 @@ export default function Ballot({ session }: { session: Session }) {
     setShowEncrypt(true);
     if (a.readAloud) a.speak(`${a.tr("encryptTitle")} ${a.tr("encryptBody")}`);
   };
+
+  // Modal a11y: trap Tab inside the encrypt dialog, close on Escape, and restore
+  // focus to the trigger on close (WCAG 2.1.2 no keyboard trap / 2.4.3 focus order).
+  useEffect(() => {
+    if (!showEncrypt) return;
+    const dialog = dialogRef.current;
+    const trigger = triggerRef.current;
+    const focusables = () =>
+      Array.from(
+        dialog?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      ).filter((el) => !el.hasAttribute("disabled"));
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setShowEncrypt(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      // Restore focus only if the trigger is still mounted (not when navigating away).
+      if (trigger && document.contains(trigger)) trigger.focus();
+    };
+  }, [showEncrypt]);
 
   return (
     <Screen title={a.tr("ballotTitle")} help={a.tr("ballotHelp")} step={2} totalSteps={4}>
@@ -73,7 +116,7 @@ export default function Ballot({ session }: { session: Session }) {
       ) : null}
 
       <div className="actions">
-        <button type="button" className="btn btn-primary btn-lg" onClick={proceed}>
+        <button type="button" ref={triggerRef} className="btn btn-primary btn-lg" onClick={proceed}>
           {a.tr("reviewVotes")} →
         </button>
         <Link className="btn btn-ghost" to="/login">
@@ -84,6 +127,7 @@ export default function Ballot({ session }: { session: Session }) {
       {showEncrypt && (
         <div className="dialog-backdrop" role="presentation" onClick={() => setShowEncrypt(false)}>
           <div
+            ref={dialogRef}
             className="dialog"
             role="alertdialog"
             aria-modal="true"
