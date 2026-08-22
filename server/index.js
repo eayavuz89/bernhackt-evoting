@@ -21,6 +21,25 @@ const GLOBAL_PER_DAY = Number(process.env.GLOBAL_PER_DAY || 300);
 // Session length is capped client-side; we also request a short token TTL.
 const TOKEN_TTL_SECONDS = Number(process.env.TOKEN_TTL_SECONDS || 60);
 
+// ---- noisy-environment tuning (hackathon demo hall) ----
+// server_vad with a raised threshold ignores background chatter that semantic_vad
+// treats as barge-in; far_field noise reduction targets speaker-mode/room mics.
+const VAD_TYPE = process.env.VAD_TYPE || "server_vad"; // server_vad | semantic_vad
+const VAD_THRESHOLD = Number(process.env.VAD_THRESHOLD || 0.75); // 0..1, higher = needs louder speech
+const VAD_PREFIX_MS = Number(process.env.VAD_PREFIX_MS || 300);
+const VAD_SILENCE_MS = Number(process.env.VAD_SILENCE_MS || 700);
+const NOISE_REDUCTION = process.env.NOISE_REDUCTION || "far_field"; // near_field | far_field | off
+
+function turnDetection() {
+  if (VAD_TYPE === "semantic_vad") return { type: "semantic_vad" };
+  return {
+    type: "server_vad",
+    threshold: VAD_THRESHOLD,
+    prefix_padding_ms: VAD_PREFIX_MS,
+    silence_duration_ms: VAD_SILENCE_MS,
+  };
+}
+
 const hits = new Map(); // ip -> number[] (timestamps ms)
 let dayCount = 0;
 let dayStamp = new Date().toISOString().slice(0, 10);
@@ -48,7 +67,14 @@ function allow(ip) {
 }
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, configured: !!OPENAI_KEY, model: MODEL, voice: VOICE });
+  res.json({
+    ok: true,
+    configured: !!OPENAI_KEY,
+    model: MODEL,
+    voice: VOICE,
+    vad: turnDetection(),
+    noise_reduction: NOISE_REDUCTION,
+  });
 });
 
 app.post("/api/realtime/token", async (req, res) => {
@@ -80,7 +106,10 @@ app.post("/api/realtime/token", async (req, res) => {
           output_modalities: ["audio"],
           audio: {
             input: {
-              turn_detection: { type: "semantic_vad" },
+              turn_detection: turnDetection(),
+              ...(NOISE_REDUCTION !== "off"
+                ? { noise_reduction: { type: NOISE_REDUCTION } }
+                : {}),
               transcription: { model: "whisper-1" },
             },
             output: { voice: VOICE },
