@@ -7,13 +7,15 @@ interface Props {
   step?: number;
   totalSteps?: number;
   children: React.ReactNode;
+  /** Small uppercase-tracked label rendered above the heading. */
+  eyebrow?: string;
   /** Extra text appended to the spoken read-aloud summary. */
   speakExtra?: string;
 }
 
 // Shared screen scaffold: focuses the heading on mount (screen-reader announce),
 // shows a step indicator, and reads the page aloud when read-aloud is enabled.
-export default function Screen({ title, help, step, totalSteps, children, speakExtra }: Props) {
+export default function Screen({ title, help, step, totalSteps, children, eyebrow, speakExtra }: Props) {
   const a = useA11y();
   const h1Ref = useRef<HTMLHeadingElement>(null);
 
@@ -48,6 +50,7 @@ export default function Screen({ title, help, step, totalSteps, children, speakE
         </nav>
       ) : null}
 
+      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
       <h1 tabIndex={-1} ref={h1Ref} className="screen-title">
         {title}
       </h1>

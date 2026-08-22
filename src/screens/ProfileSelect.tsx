@@ -15,10 +15,13 @@ export default function ProfileSelect() {
   const nav = useNavigate();
 
   return (
-    <Screen title={a.tr("chooseProfile")} help={a.tr("chooseProfileHelp")}>
-      <p className="tagline">{a.tr("tagline")}</p>
+    <>
+      {/* Decorative Swiss-landscape wash — home screen only, purely decorative. */}
+      <div className="home-bg" aria-hidden="true" />
+      <Screen title={a.tr("chooseProfile")} help={a.tr("chooseProfileHelp")} eyebrow={a.tr("appName")}>
+        <p className="tagline">{a.tr("tagline")}</p>
 
-      <ul className="profile-grid" role="list">
+        <ul className="profile-grid" role="list">
         {CARDS.map(({ p, icon }) => (
           <li key={p}>
             <button
@@ -37,14 +40,15 @@ export default function ProfileSelect() {
         ))}
       </ul>
 
-      <div className="actions">
-        <button type="button" className="btn btn-primary btn-lg" onClick={() => nav("/login")}>
-          {a.tr("start")} →
-        </button>
-        <Link className="btn btn-ghost" to="/card">
-          {a.tr("openCard")}
-        </Link>
-      </div>
-    </Screen>
+        <div className="actions">
+          <button type="button" className="btn btn-primary btn-lg" onClick={() => nav("/login")}>
+            {a.tr("start")} →
+          </button>
+          <Link className="btn btn-ghost" to="/card">
+            {a.tr("openCard")}
+          </Link>
+        </div>
+      </Screen>
+    </>
   );
 }

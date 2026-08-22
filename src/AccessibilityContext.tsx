@@ -35,17 +35,44 @@ const PROFILE_DEFAULTS: Record<Profile, Partial<A11yState>> = {
 
 const LANG_VOICE: Record<Lang, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-GB" };
 
+// Persisted accessibility preferences — restored on reload / direct link so a
+// user who needs high contrast or large text never loses it. reducedMotion is
+// intentionally NOT stored (it always follows the live OS setting).
+const STORAGE_KEY = "stimmzugang:a11y";
+
+interface PersistedA11y {
+  profile: Profile;
+  lang: Lang;
+  easy: boolean;
+  fontScale: number;
+  contrast: "normal" | "high";
+  readAloud: boolean;
+}
+
+function loadPersisted(): Partial<PersistedA11y> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Partial<PersistedA11y>) : {};
+  } catch {
+    return {}; // corrupt value or storage blocked (private mode) — fall back to defaults
+  }
+}
+
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
   const prefersReduced =
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const [profile, setProfileRaw] = useState<Profile>("standard");
-  const [lang, setLang] = useState<Lang>("de");
-  const [easy, setEasy] = useState(false);
-  const [fontScale, setFontScale] = useState(1.0);
-  const [contrast, setContrast] = useState<"normal" | "high">("normal");
+  // Restore saved preferences once (falls back to defaults when nothing stored).
+  const saved = useMemo(loadPersisted, []);
+
+  const [profile, setProfileRaw] = useState<Profile>(saved.profile ?? "standard");
+  const [lang, setLang] = useState<Lang>(saved.lang ?? "de");
+  const [easy, setEasy] = useState(saved.easy ?? false);
+  const [fontScale, setFontScale] = useState(saved.fontScale ?? 1.0);
+  const [contrast, setContrast] = useState<"normal" | "high">(saved.contrast ?? "normal");
   const [reducedMotion] = useState<boolean>(prefersReduced);
-  const [readAloud, setReadAloud] = useState(false);
+  const [readAloud, setReadAloud] = useState(saved.readAloud ?? false);
 
   const setProfile = useCallback((p: Profile) => {
     setProfileRaw(p);
@@ -56,7 +83,8 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     if (d.readAloud !== undefined) setReadAloud(d.readAloud);
   }, []);
 
-  // Reflect state onto <html> so CSS can respond.
+  // Reflect state onto <html> so CSS can respond. Runs on mount too, so
+  // restored contrast / profile / text-size apply immediately on load.
   useEffect(() => {
     const el = document.documentElement;
     el.setAttribute("data-profile", profile);
@@ -65,6 +93,19 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     el.setAttribute("lang", lang);
     el.style.setProperty("--font-scale", String(fontScale));
   }, [profile, contrast, reducedMotion, lang, fontScale]);
+
+  // Persist preferences whenever they change (reducedMotion excluded — OS-driven).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ profile, lang, easy, fontScale, contrast, readAloud })
+      );
+    } catch {
+      /* storage full or blocked — non-fatal, preferences just won't persist */
+    }
+  }, [profile, lang, easy, fontScale, contrast, readAloud]);
 
   const tr = useCallback((key: string) => t(key, lang, easy), [lang, easy]);
 

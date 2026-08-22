@@ -1,42 +1,73 @@
 /* ============================================================
    StimmZugang — barrier-free e-voting prototype
-   Accessibility is driven by data-attributes on <html>:
-   data-profile, data-contrast, data-reduced-motion + --font-scale.
+   Visual language: Swiss Grotesk Minimal (civic-official).
+   Warm-neutral base + one disciplined action accent (deep blue),
+   green reserved for success, hairline borders instead of shadows,
+   crisp 4px radius family, editorial meta-labels.
+
+   Accessibility is non-negotiable and drives everything via
+   data-attributes on <html>: data-profile, data-contrast,
+   data-reduced-motion + --font-scale.
    ============================================================ */
 
 :root {
   --font-scale: 1;
-  --bg: #f4f6fb;
-  --surface: #ffffff;
-  --ink: #16202e;
-  --ink-soft: #4a5a70;
-  --primary: #14509a;
-  --primary-ink: #ffffff;
-  --primary-2: #0d3c78;
-  --accent: #0a7d5a;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Distinctive display face for headings & brand; body/UI/codes stay on Inter. */
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+
+  /* Warm-neutral base */
+  --paper: #f4f3ee;      /* page background — warm off-white, not cold blue */
+  --surface: #ffffff;    /* cards, forms */
+  --surface-2: #faf9f5;  /* subtle warm panel (code zones) */
+  --ink: #191a1d;        /* warm near-black text */
+  --ink-soft: #565d6b;   /* muted text (meets AA on paper/surface) */
+
+  /* Single disciplined action accent = deep official blue */
+  --action: #12508c;
+  --action-strong: #0c3a68; /* hover / pressed */
+  --action-ink: #ffffff;
+  --action-tint: rgba(18, 80, 140, 0.08);
+
+  /* Semantic states */
+  --success: #0a6b4b;    /* confirm / done / chosen */
+  --success-strong: #075139;
+  --success-tint: rgba(10, 107, 75, 0.09);
   --danger: #b3261e;
-  --border: #cdd6e4;
-  --focus: #ff8a00;
-  --radius: 14px;
-  --tap: 48px; /* minimum target size */
-  --shadow: 0 6px 24px rgba(20, 40, 80, 0.08);
-  --maxw: 760px;
+
+  /* Lines & edges */
+  --line: #d7d4ca;        /* warm hairline */
+  --line-strong: #191a1d; /* document frame / emphasis */
+
+  --focus: #ff7a00;       /* strong, always-visible focus */
+  --radius: 4px;          /* one crisp family */
+  --radius-sm: 2px;
+  --tap: 48px;            /* minimum target size */
+  --elev: 0 14px 44px rgba(20, 30, 55, 0.20); /* ONLY for true floating layers */
+  /* Softer, grounded warm shadow for card hover (not an AI glow) */
+  --shadow-card-hover: 0 2px 6px -2px rgba(20, 24, 31, 0.07), 0 16px 34px -18px rgba(20, 24, 31, 0.16);
+  --maxw: 1040px;
 }
 
-/* High-contrast theme */
+/* High-contrast theme — every token above has a counterpart here */
 html[data-contrast="high"] {
-  --bg: #000000;
+  --paper: #000000;
   --surface: #0a0a0a;
+  --surface-2: #0a0a0a;
   --ink: #ffffff;
-  --ink-soft: #e6e6e6;
-  --primary: #ffd400;
-  --primary-ink: #000000;
-  --primary-2: #ffe64d;
-  --accent: #4dff9e;
+  --ink-soft: #ededed;
+  --action: #ffd400;
+  --action-strong: #ffe64d;
+  --action-ink: #000000;
+  --action-tint: rgba(255, 212, 0, 0.14);
+  --success: #4dff9e;
+  --success-strong: #7dffbb;
+  --success-tint: rgba(77, 255, 158, 0.15);
   --danger: #ff6b6b;
-  --border: #ffffff;
+  --line: #ffffff;
+  --line-strong: #ffffff;
   --focus: #00e5ff;
-  --shadow: none;
+  --elev: none;
 }
 
 * {
@@ -44,15 +75,17 @@ html[data-contrast="high"] {
 }
 
 html {
-  font-size: calc(112.5% * var(--font-scale)); /* 18px base * scale */
+  font-size: calc(100% * var(--font-scale)); /* 16px base * scale */
 }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--paper);
   color: var(--ink);
-  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Motion off when requested */
@@ -66,7 +99,7 @@ html[data-reduced-motion="true"] * {
 :focus-visible {
   outline: 4px solid var(--focus);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 html[data-profile="motor"] :focus-visible,
 html[data-profile="blind"] :focus-visible {
@@ -74,20 +107,21 @@ html[data-profile="blind"] :focus-visible {
   outline-offset: 4px;
 }
 
-/* Skip link */
+/* Skip link — kept in the tab order (translate off-screen, not left:-9999px),
+   revealed on focus. Guaranteed reachable by the very first Tab. */
 .skip-link {
   position: absolute;
-  left: -9999px;
+  left: 0;
   top: 0;
-  background: var(--primary);
-  color: var(--primary-ink);
+  transform: translateY(-120%);
+  background: var(--action);
+  color: var(--action-ink);
   padding: 12px 18px;
   z-index: 1000;
-  border-radius: 0 0 10px 0;
   font-weight: 700;
 }
 .skip-link:focus {
-  left: 0;
+  transform: translateY(0);
 }
 
 /* ---------------- Toolbar ---------------- */
@@ -95,51 +129,283 @@ html[data-profile="blind"] :focus-visible {
   position: sticky;
   top: 0;
   z-index: 100;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+html[data-contrast="high"] .toolbar {
   background: var(--surface);
-  border-bottom: 2px solid var(--border);
-  box-shadow: var(--shadow);
+  backdrop-filter: none;
+  border-bottom-width: 2px;
 }
 .toolbar-inner {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
 }
 .brand {
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 1.15rem;
-  color: var(--primary);
+  letter-spacing: -0.01em;
+  color: var(--ink);
   white-space: nowrap;
 }
-.toolbar-controls {
+.brand-mark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  background: var(--action);
+  position: relative;
+}
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--action-ink);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(40deg);
+}
+/* Accessibility menu (disclosure): trigger + floating panel */
+.a11y-wrap {
+  position: relative;
+}
+.a11y-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: var(--tap);
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.a11y-trigger:hover {
+  border-color: var(--action);
+}
+.a11y-trigger.open {
+  border-color: var(--action);
+  background: var(--action-tint);
+}
+.a11y-trigger-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.a11y-caret {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+.a11y-trigger.open .a11y-caret {
+  transform: translateY(1px) rotate(-135deg);
+}
+.a11y-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 150;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--elev);
+  padding: 16px;
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 14px;
+}
+.a11y-menu[hidden] {
+  display: none;
+}
+.a11y-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.a11y-close {
+  min-width: 36px;
+  min-height: 36px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.a11y-close:hover {
+  border-color: var(--action);
+}
+.a11y-menu-sep {
+  height: 1px;
+  border: 0;
+  background: var(--line);
+  margin: 0;
+}
+.a11y-menu .ctl .dd,
+.a11y-menu .toggle {
+  width: 100%;
+}
+.a11y-menu .toggle {
+  text-align: left;
+}
+.a11y-menu .btn-row .icon-btn {
+  flex: 1;
 }
 .ctl {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 .ctl-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--ink-soft);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.08em;
 }
-.ctl select {
+/* ---- Custom accessible dropdown (listbox) -----------------------------
+   Replaces the native <select> so the OPEN option list follows the house
+   style: white surface, hairline border, floating shadow, blue-fill active
+   row, checkmark on the selected item, orange keyboard focus. The trigger
+   keeps the exact closed-state look the native select had (custom caret). */
+.dd {
+  position: relative;
+  width: 100%;
+}
+.dd-trigger {
+  width: 100%;
   min-height: var(--tap);
-  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px;
   font-size: 0.95rem;
-  border: 2px solid var(--border);
-  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
+  cursor: pointer;
+}
+.dd-trigger:hover {
+  border-color: var(--action);
+}
+.dd.open .dd-trigger {
+  border-color: var(--action);
+  background: var(--action-tint);
+}
+html[data-contrast="high"] .dd-trigger {
+  border-width: 2px;
+}
+.dd-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dd-caret {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+.dd.open .dd-caret {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+/* Floating option list */
+.dd-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 200;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--elev);
+}
+.dd-list[hidden] {
+  display: none;
+}
+html[data-contrast="high"] .dd-list {
+  border-width: 2px;
+}
+.dd-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 10px 6px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+/* Selected profile row = solid blue (aria-selected is the true "chosen" state). */
+.dd-option[aria-selected="true"] {
+  background: var(--action);
+  color: var(--action-ink);
+}
+/* Highlighted (keyboard/pointer) or hovered row that is NOT the selected one =
+   pale blue, so hover reads as distinct from the solid-blue selected row. */
+.dd-option.is-active:not([aria-selected="true"]),
+.dd-option:not([aria-selected="true"]):hover {
+  background: var(--action-tint);
+}
+html[data-contrast="high"] .dd-option[aria-selected="true"] {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+.dd-check {
+  width: 16px;
+  flex: none;
+  text-align: center;
+  line-height: 1;
+}
+.dd-option[aria-selected="true"] .dd-check::before {
+  content: "✓";
+  font-weight: 800;
+}
+.dd-option-label {
+  flex: 1;
 }
 .btn-row {
   display: flex;
@@ -150,27 +416,29 @@ html[data-profile="blind"] :focus-visible {
   min-height: var(--tap);
   font-size: 1rem;
   font-weight: 800;
-  border: 2px solid var(--border);
-  border-radius: 10px;
+  font-family: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
   cursor: pointer;
 }
 .toggle {
   min-height: var(--tap);
-  padding: 6px 12px;
-  font-size: 0.9rem;
+  padding: 6px 14px;
+  font-size: 0.88rem;
   font-weight: 700;
-  border: 2px solid var(--border);
-  border-radius: 10px;
+  font-family: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
   cursor: pointer;
 }
 .toggle[aria-pressed="true"] {
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-color: var(--primary);
+  background: var(--action);
+  color: var(--action-ink);
+  border-color: var(--action);
 }
 .toggle:disabled {
   opacity: 0.45;
@@ -178,22 +446,66 @@ html[data-profile="blind"] :focus-visible {
 }
 .icon-btn:hover,
 .toggle:hover {
-  border-color: var(--primary);
+  border-color: var(--action);
 }
 
 /* ---------------- Main / screen ---------------- */
+/* Home only: a very faint Swiss-landscape wash behind everything. Purely
+   decorative (aria-hidden in markup). A heavy paper gradient sits OVER the
+   image so it never touches text contrast; the picker cards are opaque white
+   and keep full contrast regardless. Fixed so it stays put while scrolling.
+   Removed entirely in high-contrast mode and in print. */
+.home-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(to bottom, rgba(244, 243, 238, 0.86), rgba(244, 243, 238, 0.93)),
+    url("/schweiz.webp");
+  background-size: cover;
+  background-position: center 22%;
+  background-repeat: no-repeat;
+}
+html[data-contrast="high"] .home-bg {
+  display: none;
+}
+@media print {
+  .home-bg {
+    display: none;
+  }
+}
 .main {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 28px 16px 80px;
+  padding: clamp(28px, 4vw, 44px) clamp(16px, 4vw, 20px) 96px;
 }
 .main:focus {
   outline: none;
 }
+/* Card route: let the Ausweis use the full width (its own .card-page
+   controls the max-width + centring) instead of the default content cap. */
+.main-card {
+  max-width: none;
+  padding: 0;
+}
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--action);
+  margin: 0 0 14px;
+}
+html[data-contrast="high"] .eyebrow {
+  color: var(--action);
+}
 .screen-title {
-  font-size: 1.9rem;
-  line-height: 1.2;
-  margin: 6px 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 1.25rem + 2vw, 2.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  margin: 0 0 10px;
 }
 .screen-title:focus {
   outline: none;
@@ -201,51 +513,128 @@ html[data-profile="blind"] :focus-visible {
 .screen-help {
   font-size: 1.1rem;
   color: var(--ink-soft);
-  margin: 0 0 22px;
+  margin: 0 0 28px;
+  max-width: 60ch;
 }
 .tagline {
-  font-size: 1.15rem;
-  color: var(--primary);
-  font-weight: 700;
-  margin: 0 0 18px;
+  font-size: 1.1rem;
+  color: var(--ink);
+  font-weight: 600;
+  margin: 0 0 22px;
+  padding-left: 14px;
+  border-left: 3px solid var(--action);
 }
 
-/* Step indicator */
+/* Profile picker: keep the WHOLE chooser at the Standard (1.0) size no matter
+   which profile's scale preset is active — previewing a profile must not resize
+   the picker (heading, eyebrow, help, tagline; cards already pin themselves).
+   Scoped via :has(.profile-grid) so only the picker is fixed; the real voting
+   flow (login/ballot/…) still scales with --font-scale for accessibility.
+   Container neutralises the scale; children switch to em so they measure off it
+   (the responsive clamp on the title is preserved, just no longer scale-driven). */
+.screen:has(.profile-grid) {
+  font-size: calc(1rem / var(--font-scale));
+}
+.screen:has(.profile-grid) .eyebrow {
+  font-size: 0.72em;
+}
+.screen:has(.profile-grid) .screen-title {
+  font-size: clamp(1.7em, 1.25em + 2vw, 2.25em);
+}
+.screen:has(.profile-grid) .screen-help {
+  font-size: 1.1em;
+}
+.screen:has(.profile-grid) .tagline {
+  font-size: 1.1em;
+}
+
+/* Step indicator — editorial numbered progress */
 .steps {
-  margin-bottom: 18px;
+  margin-bottom: 30px;
 }
 .steps-list {
   list-style: none;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   padding: 0;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
 .step-dot {
   flex: 1;
-  height: 12px;
-  background: var(--border);
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 46px;
+  padding: 0 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   position: relative;
+  overflow: hidden;
+}
+/* progress track along the bottom of each segment */
+.step-dot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: var(--line);
+}
+/* the piece that partially fills — grows to show progress through the flow */
+.step-dot::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 5px;
+  width: 100%;
+  background: var(--action);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
 }
 .step-dot .step-num {
-  position: absolute;
-  font-size: 0;
+  position: relative;
+  z-index: 1;
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
 }
+.step-dot .step-num::before {
+  content: "0";
+}
+/* current step: half-filled ("in progress"), accent-tinted box */
 .step-dot.current {
-  background: var(--primary);
+  border-color: var(--action);
+  background: var(--action-tint);
 }
+.step-dot.current::after {
+  transform: scaleX(1);
+}
+.step-dot.current .step-num {
+  color: var(--action);
+}
+/* completed steps: fully filled in success green */
 .step-dot.done {
-  background: var(--accent);
+  border-color: var(--success);
+}
+.step-dot.done::after {
+  transform: scaleX(1);
+  background: var(--success);
+}
+.step-dot.done .step-num {
+  color: var(--success);
 }
 .step-text {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--ink-soft);
-  font-weight: 600;
 }
 
 /* ---------------- Buttons ---------------- */
@@ -255,30 +644,32 @@ html[data-profile="blind"] :focus-visible {
   justify-content: center;
   gap: 8px;
   min-height: var(--tap);
-  padding: 12px 22px;
+  padding: 12px 24px;
   font-size: 1.05rem;
   font-weight: 700;
-  border-radius: 12px;
+  font-family: inherit;
+  border-radius: var(--radius);
   border: 2px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  transition: transform 0.05s ease, background 0.15s ease;
+  transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
 }
 .btn:active {
   transform: translateY(1px);
 }
 .btn-lg {
   min-height: 60px;
-  font-size: 1.2rem;
-  padding: 14px 30px;
+  font-size: 1.18rem;
+  padding: 14px 32px;
 }
 .btn-primary {
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-color: var(--primary);
+  background: var(--action);
+  color: var(--action-ink);
+  border-color: var(--action);
 }
 .btn-primary:hover {
-  background: var(--primary-2);
+  background: var(--action-strong);
+  border-color: var(--action-strong);
 }
 .btn-primary:disabled {
   opacity: 0.5;
@@ -286,16 +677,20 @@ html[data-profile="blind"] :focus-visible {
 }
 .btn-ghost {
   background: transparent;
-  color: var(--primary);
-  border-color: var(--border);
+  color: var(--action);
+  border-color: var(--line);
 }
 .btn-ghost:hover {
-  border-color: var(--primary);
+  border-color: var(--action);
 }
 .btn-cast {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--success);
+  border-color: var(--success);
   color: #fff;
+}
+.btn-cast:hover {
+  background: var(--success-strong);
+  border-color: var(--success-strong);
 }
 html[data-contrast="high"] .btn-cast {
   color: #000;
@@ -304,7 +699,7 @@ html[data-contrast="high"] .btn-cast {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
-  margin-top: 26px;
+  margin-top: 32px;
   align-items: center;
 }
 
@@ -314,60 +709,113 @@ html[data-contrast="high"] .btn-cast {
   padding: 0;
   margin: 0 0 10px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+/* Five choices as a centred 3 + 2: every card spans two of the six columns,
+   so all cards are the SAME width and the first row fills the line. The two
+   second-row cards are shifted in by one column, centring them under the
+   first row — no lonely orphan. */
+.profile-grid > li {
+  display: flex;
+  grid-column: span 2;
+}
+.profile-grid > li:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+.profile-grid > li:nth-child(5) {
+  grid-column: 4 / span 2;
+}
+/* Tablet → 2 per row, phone → single column; cards fill their tracks. */
+@media (max-width: 760px) {
+  .profile-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .profile-grid > li,
+  .profile-grid > li:nth-child(4),
+  .profile-grid > li:nth-child(5) {
+    grid-column: auto;
+  }
+}
+@media (max-width: 480px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .profile-card {
   width: 100%;
   height: 100%;
   text-align: left;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 18px;
+  padding: 20px;
   background: var(--surface);
-  border: 3px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   cursor: pointer;
-  box-shadow: var(--shadow);
+  font-family: inherit;
+  color: var(--ink);
+  /* Neutralise --font-scale so the picker card stays ONE fixed size no matter
+     which profile (and its scale preset) is active — selecting a card must not
+     resize the picker. A <button> doesn't inherit font-size, so this lives here,
+     and .profile-icon/name/desc size in em off it. */
+  font-size: calc(1rem / var(--font-scale));
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
+/* andreritter-style hover: card lifts and casts a soft, grounded shadow */
 .profile-card:hover {
-  border-color: var(--primary);
+  border-color: var(--action);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card-hover);
+}
+/* Selected card keeps its inset ring and adds the lift shadow on hover */
+.profile-card.selected:hover {
+  box-shadow: inset 0 0 0 2px var(--action), var(--shadow-card-hover);
+}
+/* Reduced-motion: keep the shadow/border cue, drop the lift */
+html[data-reduced-motion="true"] .profile-card:hover {
+  transform: none;
 }
 .profile-card.selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(20, 80, 154, 0.18);
+  border-color: var(--action);
+  box-shadow: inset 0 0 0 2px var(--action);
 }
 html[data-contrast="high"] .profile-card.selected {
-  box-shadow: 0 0 0 4px var(--primary);
+  box-shadow: inset 0 0 0 3px var(--action);
 }
 .profile-icon {
-  font-size: 2rem;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 1.9em;
+  line-height: 1;
 }
 .profile-name {
-  font-size: 1.15rem;
+  font-size: 1.12em;
   font-weight: 800;
+  padding-right: 44px; /* clear the icon pinned to the top-right corner */
 }
 .profile-desc {
   color: var(--ink-soft);
-  font-size: 0.95rem;
+  font-size: 0.95em;
 }
 
 /* ---------------- Forms ---------------- */
 .form {
   background: var(--surface);
-  border: 2px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 22px;
-  box-shadow: var(--shadow);
+  padding: 26px;
 }
 .field {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 .field label {
   display: block;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   margin-bottom: 8px;
 }
 .input {
@@ -375,8 +823,9 @@ html[data-contrast="high"] .profile-card.selected {
   min-height: 58px;
   padding: 12px 16px;
   font-size: 1.3rem;
-  border: 2px solid var(--border);
-  border-radius: 12px;
+  font-family: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
 }
@@ -386,7 +835,8 @@ html[data-contrast="high"] .profile-card.selected {
   font-weight: 700;
 }
 .input:focus {
-  border-color: var(--primary);
+  border-color: var(--action);
+  outline-offset: 1px;
 }
 .hint {
   font-size: 0.92rem;
@@ -394,14 +844,14 @@ html[data-contrast="high"] .profile-card.selected {
   margin: 8px 0 0;
 }
 .demo-hint {
-  color: var(--accent);
+  color: var(--action);
   font-weight: 700;
 }
 .scan-note {
-  margin-top: 18px;
+  margin-top: 20px;
   color: var(--ink-soft);
-  border-top: 1px dashed var(--border);
-  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
 }
 .error {
   color: var(--danger);
@@ -411,62 +861,70 @@ html[data-contrast="high"] .profile-card.selected {
 
 /* ---------------- Ballot ---------------- */
 .proposal {
-  border: 2px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
-  padding: 18px;
-  margin: 0 0 18px;
-  box-shadow: var(--shadow);
+  padding: 22px;
+  margin: 0 0 16px;
+  min-width: 0; /* stop the fieldset's min-content width from overflowing */
 }
+/* Float the <legend> into normal flow so it sits INSIDE the card instead of
+   straddling (and breaking) the top border — the default fieldset/legend look. */
 .proposal-legend {
+  float: left;
+  width: 100%;
   font-weight: 800;
   font-size: 1.15rem;
+  line-height: 1.3;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
   padding: 0;
+  margin: 0;
 }
 .proposal-num {
   flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: var(--primary-ink);
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--action);
+  color: var(--action-ink);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 .proposal-text {
+  clear: both; /* drop below the floated legend */
   color: var(--ink-soft);
-  margin: 10px 0 14px;
+  margin: 12px 0 16px;
 }
 .choice-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 .choice {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border: 3px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   cursor: pointer;
   min-height: 64px;
   background: var(--surface);
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
 .choice:hover {
-  border-color: var(--primary);
+  border-color: var(--action);
 }
 .choice.chosen {
-  border-color: var(--accent);
-  background: rgba(10, 125, 90, 0.08);
-}
-html[data-contrast="high"] .choice.chosen {
-  background: rgba(77, 255, 158, 0.15);
+  border-color: var(--success);
+  box-shadow: inset 0 0 0 1px var(--success);
+  background: var(--success-tint);
 }
 .choice input {
   position: absolute;
@@ -483,8 +941,8 @@ html[data-contrast="high"] .choice.chosen {
   position: relative;
 }
 .choice.chosen .choice-mark {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--success);
+  background: var(--success);
 }
 .choice.chosen .choice-mark::after {
   content: "✓";
@@ -513,21 +971,20 @@ html[data-contrast="high"] .choice.chosen .choice-mark::after {
 .verify-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .verify-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 16px;
+  padding: 18px;
   background: var(--surface);
-  border: 2px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
 }
 .verify-info {
   display: flex;
@@ -548,27 +1005,28 @@ html[data-contrast="high"] .choice.chosen .choice-mark::after {
 }
 .verify-code-label {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   color: var(--ink-soft);
   font-weight: 700;
+  margin-bottom: 4px;
 }
 .code-badge {
   display: inline-block;
-  font-size: 1.6rem;
-  font-weight: 900;
+  font-size: 1.55rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.1em;
-  color: var(--primary);
-  background: rgba(20, 80, 154, 0.08);
-  border: 2px solid var(--primary);
-  border-radius: 10px;
-  padding: 4px 12px;
+  letter-spacing: 0.12em;
+  color: var(--action);
+  background: var(--action-tint);
+  border: 1px solid var(--action);
+  border-radius: var(--radius);
+  padding: 4px 14px;
 }
 html[data-contrast="high"] .code-badge {
   background: transparent;
-  color: var(--primary);
+  color: var(--action);
 }
 .code-badge-lg {
   font-size: 2.1rem;
@@ -577,36 +1035,37 @@ html[data-contrast="high"] .code-badge {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
-  border: 3px solid var(--border);
-  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   cursor: pointer;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 700;
   background: var(--surface);
 }
 .confirm-check input {
   width: 30px;
   height: 30px;
-  accent-color: var(--accent);
+  flex: none;
+  accent-color: var(--success);
 }
 
 /* ---------------- Done ---------------- */
 .done-badge {
   display: flex;
   justify-content: center;
-  margin: 10px 0 24px;
+  margin: 12px 0 28px;
 }
 .done-check {
-  width: 110px;
-  height: 110px;
+  width: clamp(84px, 22vw, 108px);
+  height: clamp(84px, 22vw, 108px);
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--success);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4rem;
+  font-size: clamp(2.8rem, 1.8rem + 4vw, 4rem);
   font-weight: 900;
   animation: pop 0.35s ease;
 }
@@ -625,12 +1084,15 @@ html[data-contrast="high"] .done-check {
 }
 .finalize {
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 .finish-text {
   text-align: center;
   color: var(--ink-soft);
   font-size: 1.1rem;
+  max-width: 52ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ============================================================
@@ -662,62 +1124,69 @@ html[data-profile="cognitive"] .choice-label {
   font-size: 1.35rem;
 }
 
-/* Senior: generous sizing handled mostly by font-scale + high contrast */
+/* Senior: generous sizing handled mostly by font-scale + high contrast.
+   Single column keeps all three options balanced — a 2-column grid left the
+   third option ("Leer einlegen") alone on a half-empty row (misaligned). */
 html[data-profile="senior"] .choice-row {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 
 /* ============================================================
    Voting card (Stimmrechtsausweis)
+   Self-contained, print-safe palette (fixed dark-on-white so it
+   prints identically regardless of the on-screen theme).
    ============================================================ */
 .card-page {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 20px 16px 60px;
+  padding: clamp(18px, 3vw, 32px) clamp(14px, 3vw, 24px) 72px;
 }
 .card-toolbar {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 .voting-card {
   position: relative;
   background: #ffffff;
-  color: #10233f;
-  border: 3px solid #10233f;
-  border-radius: 16px;
-  padding: 26px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  color: #14181f;
+  border: 2px solid #14181f;
+  border-radius: var(--radius);
+  padding: clamp(18px, 3.2vw, 30px);
 }
 .vc-braille {
   position: absolute;
-  top: 14px;
-  right: 18px;
+  top: 16px;
+  right: 20px;
   font-size: 1.4rem;
   letter-spacing: 0.2em;
-  color: #10233f;
+  color: #14181f;
 }
 .vc-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 3px solid #10233f;
-  padding-bottom: 14px;
-  margin-bottom: 16px;
+  border-bottom: 2px solid #14181f;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
 }
 .vc-title {
-  font-size: 1.7rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 1.05rem + 1.3vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 .vc-subtitle {
   margin: 4px 0 0;
-  color: #5a6b85;
+  color: #5a6377;
   font-weight: 600;
 }
 .vc-logo {
-  font-size: 2.4rem;
+  font-size: clamp(1.6rem, 1rem + 2.4vw, 2.2rem);
+  line-height: 1;
 }
 .vc-meta {
   display: grid;
@@ -726,41 +1195,46 @@ html[data-profile="senior"] .choice-row {
   margin: 0 0 18px;
 }
 .vc-meta dt {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #5a6b85;
-  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: #5a6377;
+  font-weight: 800;
 }
 .vc-meta dd {
-  margin: 2px 0 0;
+  margin: 3px 0 0;
   font-size: 1.05rem;
   font-weight: 700;
 }
 .vc-scan {
-  float: right;
   text-align: center;
-  margin: 0 0 12px 18px;
+  margin: 0 auto 14px;
 }
 .vc-qr {
-  border: 3px solid #10233f;
-  border-radius: 12px;
+  display: inline-block;
+  border: 2px solid #14181f;
+  border-radius: var(--radius);
   padding: 8px;
   background: #fff;
   line-height: 0;
 }
+.vc-qr svg {
+  display: block;
+  width: clamp(112px, 32vw, 148px);
+  height: auto;
+}
 .vc-scan-hint {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   max-width: 150px;
   margin: 8px auto 0;
-  color: #5a6b85;
+  color: #5a6377;
 }
 .vc-portal {
-  border: 2px solid #10233f;
-  border-radius: 12px;
-  padding: 12px 14px;
+  border: 1px solid #c3cad6;
+  border-radius: var(--radius);
+  padding: 14px 16px;
   margin-bottom: 14px;
-  background: #f7f9fd;
+  background: #f6f8fc;
 }
 .vc-portal-period {
   margin: 0 0 8px;
@@ -768,21 +1242,22 @@ html[data-profile="senior"] .choice-row {
 }
 .vc-portal-label {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #5a6b85;
-  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: #5a6377;
+  font-weight: 800;
 }
 .vc-portal-url {
   margin: 2px 0 6px;
-  font-size: 1.35rem;
+  font-size: clamp(1.02rem, 0.85rem + 0.9vw, 1.3rem);
   font-weight: 900;
+  overflow-wrap: anywhere;
 }
 .vc-portal-fp {
   margin: 0;
   font-size: 0.72rem;
-  color: #5a6b85;
+  color: #5a6377;
 }
 .vc-portal-fp code {
   word-break: break-all;
@@ -791,48 +1266,49 @@ html[data-profile="senior"] .choice-row {
 .vc-codes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .vc-code-block {
-  border: 2px solid #10233f;
-  border-radius: 12px;
-  padding: 12px 14px;
+  border: 1px solid #c3cad6;
+  border-radius: var(--radius);
+  padding: 14px 16px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
 }
 .vc-sym {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   line-height: 1.1;
   flex: none;
-  color: #10233f;
+  color: #12508c;
 }
 .vc-grow {
   flex: 1;
 }
 .vc-code-init {
-  background: #eef4ff;
+  background: #eef4fb;
 }
 .vc-code-confirm {
-  background: #fff6e8;
+  background: #fbf6ec;
 }
 .vc-code-final {
-  background: #e9fbf1;
+  background: #ecf8f2;
 }
 .vc-code-label {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: #34455f;
   font-weight: 800;
   margin-bottom: 4px;
 }
 .vc-code-value {
-  font-size: 1.7rem;
+  font-size: clamp(1.15rem, 0.85rem + 1.5vw, 1.65rem);
   font-weight: 900;
   letter-spacing: 0.12em;
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 .vc-choice-codes {
   list-style: none;
@@ -847,7 +1323,7 @@ html[data-profile="senior"] .choice-row {
   align-items: baseline;
   gap: 10px;
   flex-wrap: wrap;
-  border-bottom: 1px dotted #9fb0c8;
+  border-bottom: 1px solid #d8dee8;
   padding-bottom: 6px;
 }
 .vc-choice-title {
@@ -863,8 +1339,8 @@ html[data-profile="senior"] .choice-row {
 .vc-choice-num {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
-  background: #10233f;
+  border-radius: var(--radius-sm);
+  background: #14181f;
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -879,16 +1355,15 @@ html[data-profile="senior"] .choice-row {
 }
 .vc-choice-pair em {
   font-style: normal;
-  color: #5a6b85;
+  color: #5a6377;
   font-weight: 600;
   margin-right: 4px;
 }
 .vc-inst {
   margin-top: 16px;
-  border: 2px solid #10233f;
-  border-radius: 12px;
-  padding: 12px 14px;
-  clear: both;
+  border: 1px solid #c3cad6;
+  border-radius: var(--radius);
+  padding: 14px 16px;
 }
 .vc-inst-title {
   font-size: 1rem;
@@ -903,7 +1378,7 @@ html[data-profile="senior"] .choice-row {
   gap: 4px 18px;
 }
 .vc-bottom {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -916,13 +1391,106 @@ html[data-profile="senior"] .choice-row {
 .vc-footer {
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 2px dashed #10233f;
+  border-top: 1px solid #14181f;
   color: #34455f;
   font-weight: 600;
-  clear: both;
+}
+
+/* ----- Responsive: fit the whole Ausweis on wide screens -----
+   On wide screens the card lays out as a grid (screen only): the
+   portal box and QR sit side by side, and the two list-heavy blocks
+   (Prüfcodes + 7-step instructions) reflow horizontally so the card
+   stays short instead of being one tall, narrow strip. DOM order is
+   preserved, so the screen-reader / print reading order
+   (header → meta → portal → QR → codes → instructions) is untouched;
+   print stays single-column. */
+@media screen and (min-width: 880px) {
+  .card-page {
+    max-width: 1100px;
+  }
+  .voting-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 340px);
+    gap: 16px 26px;
+    align-items: start;
+    grid-template-areas:
+      "header header"
+      "meta   meta"
+      "portal scan"
+      "codes  codes"
+      "inst   inst"
+      "bottom bottom"
+      "footer footer";
+  }
+  .voting-card > .vc-header { grid-area: header; margin-bottom: 0; }
+  .voting-card > .vc-meta   { grid-area: meta; margin-bottom: 0; }
+  .voting-card > .vc-portal { grid-area: portal; margin-bottom: 0; }
+  .voting-card > .vc-scan   { grid-area: scan; margin: 0; align-self: center; }
+  .voting-card > .vc-codes  { grid-area: codes; }
+  .voting-card > .vc-inst   { grid-area: inst; margin-top: 0; }
+  .voting-card > .vc-bottom { grid-area: bottom; margin-top: 0; }
+  .voting-card > .vc-footer { grid-area: footer; }
+
+  /* Small code blocks pack two-up; the tall Prüfcodes block stays
+     full width but lists its proposals in three columns. */
+  .vc-codes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  .vc-code-init,
+  .vc-code-block:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+  .vc-choice-codes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 20px;
+  }
+  .vc-choice-codes li {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  /* Instructions span full width in as many columns as fit. */
+  .vc-inst-list {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
 }
 
 /* Print: only the card */
+/* Card-Hover (Referenz: andreritter service-card): Panels heben sich leicht an,
+   werfen einen geerdeten warmen Schatten, Akzentrahmen erscheint. Nur transform/
+   opacity/shadow animiert; unter prefers-reduced-motion vollständig deaktiviert. */
+.vc-portal,
+.vc-code-block,
+.vc-inst {
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.vc-portal:hover,
+.vc-code-block:hover,
+.vc-inst:hover {
+  border-color: color-mix(in srgb, var(--action) 45%, #c3cad6);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .vc-portal,
+  .vc-code-block,
+  .vc-inst {
+    transition: border-color 0.2s ease;
+  }
+  .vc-portal:hover,
+  .vc-code-block:hover,
+  .vc-inst:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 @media print {
   .no-print,
   .toolbar,
@@ -936,7 +1504,6 @@ html[data-profile="senior"] .choice-row {
     padding: 0;
   }
   .voting-card {
-    box-shadow: none;
     border-width: 2px;
   }
 }
@@ -945,11 +1512,12 @@ html[data-profile="senior"] .choice-row {
 .sym {
   display: inline-block;
   margin-right: 2px;
-  color: var(--primary);
+  color: var(--action);
 }
 .legal-check {
   margin-bottom: 12px;
   font-size: 1.02rem;
+  font-weight: 600;
 }
 
 /* Encrypt-and-submit dialog (official consent step) */
@@ -957,7 +1525,7 @@ html[data-profile="senior"] .choice-row {
   position: fixed;
   inset: 0;
   z-index: 300;
-  background: rgba(10, 20, 40, 0.55);
+  background: rgba(15, 20, 30, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -966,21 +1534,23 @@ html[data-profile="senior"] .choice-row {
 .dialog {
   background: var(--surface);
   color: var(--ink);
-  border: 3px solid var(--primary);
-  border-radius: 16px;
+  border: 2px solid var(--action);
+  border-radius: var(--radius);
   max-width: 560px;
   width: 100%;
-  padding: 22px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  padding: 26px;
+  box-shadow: var(--elev);
 }
 .dialog-title {
+  font-family: var(--font-display);
   font-size: 1.35rem;
+  font-weight: 700;
   margin: 0 0 10px;
 }
 .dialog-body {
   color: var(--ink-soft);
   font-size: 1.05rem;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
 }
 html[data-contrast="high"] .dialog-body {
   color: var(--ink);
@@ -997,81 +1567,88 @@ html[data-contrast="high"] .dialog-body {
    ============================================================ */
 .voice-fab {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  right: 24px;
+  bottom: 24px;
   z-index: 200;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 60px;
+  min-height: 56px;
   padding: 12px 22px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, #7a1fa2, #14509a);
-  border: 3px solid #fff;
-  border-radius: 999px;
+  font-family: inherit;
+  color: var(--action-ink);
+  background: var(--action);
+  border: 2px solid var(--action);
+  border-radius: var(--radius);
   cursor: pointer;
-  box-shadow: 0 8px 26px rgba(20, 40, 80, 0.35);
+  box-shadow: var(--elev);
+}
+.voice-fab:hover {
+  background: var(--action-strong);
+  border-color: var(--action-strong);
 }
 html[data-contrast="high"] .voice-fab {
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-color: var(--primary-ink);
+  border-color: var(--action-ink);
 }
 .voice-fab.live {
-  animation: pulse 1.4s ease-in-out infinite;
+  animation: pulse 1.6s ease-in-out infinite;
 }
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(122, 31, 162, 0.55);
+    box-shadow: 0 0 0 0 var(--action-tint);
   }
   50% {
-    box-shadow: 0 0 0 14px rgba(122, 31, 162, 0);
+    box-shadow: 0 0 0 14px transparent;
   }
 }
 .voice-panel {
   position: fixed;
-  right: 20px;
+  right: 24px;
   bottom: 92px;
   z-index: 200;
-  width: min(380px, calc(100vw - 40px));
+  width: min(380px, calc(100vw - 48px));
   background: var(--surface);
   color: var(--ink);
-  border: 3px solid var(--primary);
-  border-radius: 16px;
-  box-shadow: 0 16px 44px rgba(20, 40, 80, 0.28);
-  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--elev);
+  padding: 16px;
 }
 .voice-panel-head {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 1.05rem;
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 .voice-x {
   margin-left: auto;
   min-width: 40px;
   min-height: 40px;
-  border: 2px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
   cursor: pointer;
   font-size: 1rem;
 }
+.voice-x:hover {
+  border-color: var(--action);
+}
 .voice-dot {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--ink-soft);
   flex: none;
 }
 .voice-dot.live {
-  background: #10b76b;
-  animation: pulse 1.4s ease-in-out infinite;
+  background: var(--success);
+  animation: pulse 1.6s ease-in-out infinite;
 }
 .voice-dot.connecting {
   background: var(--focus);
@@ -1092,10 +1669,10 @@ html[data-contrast="high"] .voice-fab {
 .voice-transcript {
   max-height: 240px;
   overflow-y: auto;
-  border: 2px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   padding: 10px;
-  background: var(--bg);
+  background: var(--paper);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1108,22 +1685,22 @@ html[data-contrast="high"] .voice-fab {
 .vt-line {
   margin: 0;
   padding: 8px 10px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   font-size: 1rem;
   line-height: 1.4;
 }
 .vt-user {
-  background: rgba(20, 80, 154, 0.1);
+  background: var(--action-tint);
   align-self: flex-end;
   text-align: right;
 }
 .vt-assistant {
-  background: rgba(122, 31, 162, 0.1);
+  background: var(--success-tint);
 }
 html[data-contrast="high"] .vt-user,
 html[data-contrast="high"] .vt-assistant {
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
 }
 .vt-who {
   font-size: 0.9rem;
@@ -1133,6 +1710,9 @@ html[data-contrast="high"] .vt-assistant {
   display: flex;
   justify-content: flex-end;
 }
+.voice-unlock {
+  margin-bottom: 10px;
+}
 
 @media (max-width: 560px) {
   .voice-fab-text {
@@ -1140,6 +1720,15 @@ html[data-contrast="high"] .vt-assistant {
   }
   .voice-fab {
     padding: 14px;
+  }
+  /* Toolbar trigger collapses to an icon-only hamburger so the brand +
+     button fit narrow screens. The button keeps its accessible name via
+     aria-label, so hiding the visible text is safe. */
+  .a11y-trigger-text {
+    display: none;
+  }
+  .a11y-trigger {
+    padding: 0 12px;
   }
   .choice-row {
     grid-template-columns: 1fr;
