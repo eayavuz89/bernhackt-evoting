@@ -160,7 +160,7 @@ html[data-contrast="high"] .toolbar {
 }
 .brand-logo {
   display: block;
-  height: 46px;
+  height: 60px;
   width: auto;
 }
 /* The wordmark's dark blue would vanish on the black high-contrast header —
@@ -1584,16 +1584,16 @@ html[data-contrast="high"] .dialog-body {
   z-index: 200;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 56px;
-  padding: 12px 22px;
-  font-size: 1.05rem;
-  font-weight: 800;
-  font-family: inherit;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  padding: 0;
+  font-size: 2.1rem; /* large icon */
+  line-height: 1;
   color: var(--action-ink);
   background: var(--action);
   border: 2px solid var(--action);
-  border-radius: var(--radius);
+  border-radius: 50%; /* round */
   cursor: pointer;
   box-shadow: var(--elev);
 }
@@ -1616,18 +1616,167 @@ html[data-contrast="high"] .voice-fab {
     box-shadow: 0 0 0 14px transparent;
   }
 }
-.voice-panel {
+/* Centered modal (backdrop dims the page; dialog sits in the middle) */
+.voice-backdrop {
   position: fixed;
-  right: 24px;
-  bottom: 92px;
-  z-index: 200;
-  width: min(380px, calc(100vw - 48px));
+  inset: 0;
+  z-index: 300;
+  background: rgba(15, 20, 30, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: voice-fade 0.2s ease;
+}
+.voice-modal {
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   background: var(--surface);
   color: var(--ink);
-  border: 1px solid var(--line);
+  border: 2px solid var(--action);
   border-radius: var(--radius);
   box-shadow: var(--elev);
-  padding: 16px;
+  padding: 22px;
+  animation: voice-pop 0.24s ease;
+}
+@keyframes voice-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes voice-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- Talking robot (pure CSS, decorative) ---- */
+.voice-robot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px 0 18px;
+}
+.robot-antenna {
+  width: 4px;
+  height: 16px;
+  background: var(--action);
+  border-radius: 2px;
+  position: relative;
+}
+.robot-antenna::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  margin-left: -5.5px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: robot-glow 2s ease-in-out infinite;
+}
+.robot-head {
+  position: relative;
+  width: 116px;
+  height: 94px;
+  background: var(--action);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  animation: robot-bob 3s ease-in-out infinite;
+}
+/* side ears */
+.robot-head::before,
+.robot-head::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 28px;
+  margin-top: -14px;
+  background: var(--action);
+  border-radius: 3px;
+}
+.robot-head::before { left: -8px; }
+.robot-head::after { right: -8px; }
+.robot-eyes {
+  display: flex;
+  gap: 24px;
+}
+.robot-eye {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--action-ink);
+  animation: robot-blink 4s infinite;
+}
+.robot-mouth {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+}
+.robot-mouth span {
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--action-ink);
+}
+
+/* idle keyframes */
+@keyframes robot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes robot-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+@keyframes robot-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* LIVE: robot "talks" — mouth bars bounce like a sound wave, eyes turn green */
+.voice-robot.live .robot-head { animation-duration: 1.6s; }
+.voice-robot.live .robot-eye { background: var(--success); }
+.voice-robot.live .robot-mouth span {
+  animation: robot-talk 0.7s ease-in-out infinite;
+}
+.voice-robot.live .robot-mouth span:nth-child(1) { animation-delay: 0s; }
+.voice-robot.live .robot-mouth span:nth-child(2) { animation-delay: 0.12s; }
+.voice-robot.live .robot-mouth span:nth-child(3) { animation-delay: 0.24s; }
+.voice-robot.live .robot-mouth span:nth-child(4) { animation-delay: 0.12s; }
+.voice-robot.live .robot-mouth span:nth-child(5) { animation-delay: 0s; }
+@keyframes robot-talk {
+  0%, 100% { height: 5px; }
+  50% { height: 18px; }
+}
+
+/* CONNECTING: antenna pulses faster (thinking) */
+.voice-robot.connecting .robot-antenna::after { animation-duration: 0.8s; }
+
+/* ERROR: robot freezes, eyes become flat dashes, antenna steady red */
+.voice-robot.error .robot-head,
+.voice-robot.error .robot-eye,
+.voice-robot.error .robot-antenna::after { animation: none; }
+.voice-robot.error .robot-eye {
+  height: 4px;
+  border-radius: 2px;
+}
+
+/* Reduced motion: freeze modal + robot motion (OS-level; the JS toggle is
+   already covered by the global html[data-reduced-motion] reset) */
+@media (prefers-reduced-motion: reduce) {
+  .voice-backdrop,
+  .voice-modal,
+  .robot-head,
+  .robot-eye,
+  .robot-antenna::after,
+  .voice-robot.live .robot-mouth span { animation: none; }
 }
 .voice-panel-head {
   display: flex;
@@ -1678,21 +1827,14 @@ html[data-contrast="high"] .voice-fab {
   font-weight: 700;
   margin: 0 0 10px;
 }
-.voice-transcript {
-  max-height: 240px;
+/* Captions: boxless, only shown while speaking — reads as conversation, not an input */
+.voice-captions {
+  margin-top: 6px;
+  max-height: 170px;
   overflow-y: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 10px;
-  background: var(--paper);
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-.voice-empty {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  margin: 0;
 }
 .vt-line {
   margin: 0;
@@ -1727,12 +1869,6 @@ html[data-contrast="high"] .vt-assistant {
 }
 
 @media (max-width: 560px) {
-  .voice-fab-text {
-    display: none;
-  }
-  .voice-fab {
-    padding: 14px;
-  }
   /* Toolbar trigger collapses to an icon-only hamburger so the brand +
      button fit narrow screens. The button keeps its accessible name via
      aria-label, so hiding the visible text is safe. */

@@ -29,6 +29,16 @@ export default function VoiceAgent() {
 
   useEffect(() => () => hangup(), []); // cleanup on unmount
 
+  // Close the centered modal with Escape (focus/keyboard users).
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   function pushFinal(role: "user" | "assistant", text: string) {
     const t = text.trim();
     if (!t) return;
@@ -239,11 +249,17 @@ export default function VoiceAgent() {
         onClick={() => (status === "idle" || status === "error" ? start() : setOpen((o) => !o))}
       >
         <span aria-hidden="true">🎙️</span>
-        <span className="voice-fab-text">{a.tr("voiceAssistant")}</span>
       </button>
 
       {open && (
-        <div className="voice-panel" role="dialog" aria-label={a.tr("voiceAssistant")}>
+        <div className="voice-backdrop" onClick={() => setOpen(false)}>
+        <div
+          className="voice-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={a.tr("voiceAssistant")}
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="voice-panel-head">
             <span className={"voice-dot " + status} aria-hidden="true" />
             <strong>
@@ -252,6 +268,24 @@ export default function VoiceAgent() {
             <button type="button" className="voice-x" onClick={() => setOpen(false)} aria-label={a.tr("close")}>
               ✕
             </button>
+          </div>
+
+          {/* Talking robot — decorative; reacts to status (idle blinks, live talks) */}
+          <div className={"voice-robot " + status} aria-hidden="true">
+            <span className="robot-antenna" />
+            <div className="robot-head">
+              <div className="robot-eyes">
+                <span className="robot-eye" />
+                <span className="robot-eye" />
+              </div>
+              <div className="robot-mouth">
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
+            </div>
           </div>
 
           {error ? (
@@ -277,17 +311,18 @@ export default function VoiceAgent() {
             </button>
           )}
 
-          <div className="voice-transcript" aria-live="polite" aria-label={a.tr("voiceTranscript")}>
-            {lines.length === 0 ? (
-              <p className="voice-empty">{a.tr("voiceTranscriptEmpty")}</p>
-            ) : (
-              lines.map((l, i) => (
+          {/* Live captions kept for deaf / hard-of-hearing users, but only while
+              there is speech — no empty box, so it feels like talking to the robot.
+              Screen readers still get it via aria-live. */}
+          {lines.length > 0 && (
+            <div className="voice-captions" aria-live="polite" aria-label={a.tr("voiceTranscript")}>
+              {lines.map((l, i) => (
                 <p key={i} className={"vt-line vt-" + l.role}>
                   <span className="vt-who">{l.role === "user" ? "🗣️" : "🤖"}</span> {l.text}
                 </p>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div className="voice-actions">
             {live || connecting ? (
@@ -300,6 +335,7 @@ export default function VoiceAgent() {
               </button>
             )}
           </div>
+        </div>
         </div>
       )}
     </>
