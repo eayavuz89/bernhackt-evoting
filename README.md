@@ -1,26 +1,36 @@
-# StimmZugang — Barrier-free E-Voting (BärnHäckt 2026)
+# StimmZugang — Barrierefreies E-Voting (BärnHäckt 2026)
 
-Prototype for the Swiss Post challenge *"Barrier-free e-voting experience"*: an accessible
-voting portal UI + a printable voting card (Stimmrechtsausweis) layout. Platform-independent,
-front-end only (no backend — codes are static/mock, as the challenge allows).
+Prototyp für die Challenge der Schweizerischen Post *«Barrier-free e-voting experience»*:
+ein barrierefreies Abstimmungsportal + ein druckbarer Stimmrechtsausweis. Die Codes sind
+statisch/gemockt (die Challenge erlaubt das); ein kleiner Server dient ausschliesslich dem
+Ausstellen kurzlebiger Tokens für die Sprach-Assistentin.
 
-## Idea
-One adaptive interface with **accessibility profiles** (blind / motor / cognitive / senior /
-standard). The core flow mirrors Swiss Post's real *cast-as-intended* verification:
-**sign in with card code → vote → compare verification (return) codes with the card → confirm → finalise.**
+## Idee
+Eine einzige adaptive Oberfläche mit **Barrierefreiheits-Profilen** (blind / motorisch
+eingeschränkt / kognitiv / Senior:in / Standard). Der Ablauf folgt dem offiziellen
+*Two-Rounds-Return-Codes*-Schema der Post (*cast-as-intended*-Verifikation):
+**Anmeldung mit Initialisierungscode ▲ + Geburtsjahr → Abstimmen → Prüfcodes ◆ mit dem
+Ausweis vergleichen → Bestätigungscode ⬟ → Finalisierungscode ★.**
 
-## Accessibility
-- WCAG 2.2 AA oriented; targets Swiss eCH-0059 / "Zugang für alle" spirit
-- Semantic HTML, ARIA, full keyboard & switch navigation, visible focus
-- Read-aloud (Web Speech), high-contrast theme, text scaling, reduced-motion aware
-- Leichte Sprache (easy German) overlay
-- Languages: DE / FR / IT / EN
-- Voting card: high contrast, large QR sign-in, tactile/Braille marker, clear code zones, print layout
+## Barrierefreiheit
+- Ausrichtung an WCAG 2.2 AA; im Geist von eCH-0059 / «Zugang für alle»
+- Semantisches HTML, ARIA, vollständige Tastatur- & Switch-Bedienung, sichtbarer Fokus
+- Vorlesefunktion (Web Speech), Hochkontrast-Modus, Textskalierung, `reduced-motion`
+- Leichte Sprache (Deutsch)
+- Sprachen: DE / FR / IT / EN
+- **Sprach-Assistentin «Vera»** (OpenAI Realtime, WebRTC): führt blinde und motorisch
+  eingeschränkte Personen komplett freihändig durch die Stimmabgabe — mit Live-Transkript
+  und Unterbrechen jederzeit möglich (Barge-in)
+- Stimmrechtsausweis: hoher Kontrast, grosser QR-Code zur Anmeldung, taktile/Braille-Markierung,
+  formcodierte Code-Zonen (▲ ◆ ⬟ ★ — auch bei Farbfehlsichtigkeit unterscheidbar), Drucklayout
 
-## Run
+## Starten
 ```bash
-npm install && npm run dev          # local dev
-docker compose up -d --build        # container on 127.0.0.1:18140
+npm install && npm run dev          # lokale Entwicklung
+docker compose up -d --build        # Web auf 127.0.0.1:18140, Voice-API auf 127.0.0.1:18142
 ```
 
-Live: https://evoting.eayavuz.com  ·  Sample card: /card
+Für die Sprach-Assistentin: `.env.example` nach `.env` kopieren und einen OpenAI-API-Key
+eintragen (der Key verlässt den Server nie — der Browser erhält nur kurzlebige Tokens).
+
+Live: https://evoting.eayavuz.com  ·  Muster-Stimmrechtsausweis: /card
