@@ -3,7 +3,7 @@ import { useA11y } from "../context/AccessibilityContext";
 import { voiceBridge } from "../lib/voiceBridge";
 
 type Status = "idle" | "connecting" | "live" | "error";
-const SESSION_MAX_MS = 180_000; // 3 min hard cap (cost control)
+const SESSION_MAX_MS = 600_000; // 10 min hard cap (cost control)
 const CALLS_URL = "https://api.openai.com/v1/realtime/calls";
 
 interface Line {
