@@ -714,6 +714,24 @@ html[data-contrast="high"] .btn-cast {
   margin-top: 32px;
   align-items: center;
 }
+/* Home CTA pair: centred on the page, both buttons the same width + height,
+   stacked full-width on small screens. */
+.actions-cta {
+  justify-content: center;
+  align-items: stretch;
+}
+.actions-cta .btn {
+  flex: 1 1 240px;
+  max-width: 340px;
+  justify-content: center;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .actions-cta .btn {
+    flex-basis: 100%;
+    max-width: none;
+  }
+}
 
 /* ---------------- Profile grid ---------------- */
 .profile-grid {
@@ -761,8 +779,9 @@ html[data-contrast="high"] .btn-cast {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 20px;
+  gap: 8px;
+  padding: 22px;
+  min-height: 9.75em; /* a bit taller / airier */
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -799,15 +818,28 @@ html[data-contrast="high"] .profile-card.selected {
 }
 .profile-icon {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 1.9em;
+  top: 16px;
+  right: 16px;
+  width: 2.5em;
+  height: 2.5em;
   line-height: 1;
+}
+.profile-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* On the black high-contrast header/cards the blue icons would vanish — give
+   them a white plate so they stay visible. */
+html[data-contrast="high"] .profile-icon {
+  background: #fff;
+  border-radius: 8px;
+  padding: 3px;
 }
 .profile-name {
   font-size: 1.12em;
   font-weight: 800;
-  padding-right: 44px; /* clear the icon pinned to the top-right corner */
+  padding-right: 3.4em; /* keep the title clear of the top-right icon (not cramped) */
 }
 .profile-desc {
   color: var(--ink-soft);
@@ -1574,6 +1606,237 @@ html[data-contrast="high"] .dialog-body {
   justify-content: flex-end;
 }
 
+/* ---- Practice mode dialog ---- */
+.dialog.practice {
+  max-width: 520px;
+}
+.practice-intro {
+  margin: 0 0 18px;
+}
+.practice-q {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.practice-q .proposal-legend {
+  display: block;
+  float: none;
+  width: 100%;
+  padding: 0 0 12px;
+  margin: 0 0 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.practice-q .proposal-num {
+  display: none;
+}
+/* Stack the options vertically — the modal is narrow and big targets help. */
+.practice-q .choice-row {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+/* Refined option rows: clear hover, crisp selected state, tidy radio */
+.practice-q .choice {
+  min-height: 56px;
+  padding: 14px 16px;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+.practice-q .choice:hover {
+  border-color: var(--action);
+  background: var(--action-tint);
+}
+.practice-q .choice.chosen {
+  border-color: var(--success);
+  border-width: 2px;
+  box-shadow: none;
+  background: var(--success-tint);
+}
+.practice-q .choice.chosen:hover {
+  border-color: var(--success);
+  background: var(--success-tint);
+}
+.practice-q .choice-mark {
+  width: 24px;
+  height: 24px;
+  border-width: 2.5px;
+}
+.practice-q .choice-label {
+  font-size: 1.1rem;
+}
+.practice-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  background: var(--success-tint);
+  border-radius: var(--radius);
+  font-weight: 700;
+  color: var(--success-strong);
+}
+.practice-feedback span[aria-hidden] {
+  color: var(--success);
+}
+html[data-contrast="high"] .practice-feedback {
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--success);
+}
+
+/* ---------------- Onboarding tour (first-open) ---------------- */
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400; /* above toolbar (100) and voice FAB (300): full first-open modal */
+  background: rgba(15, 20, 30, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+html[data-contrast="high"] .tour-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+/* First open: the tutorial IS the landing page — opaque warm background (no dark
+   modal veil, profile picker hidden underneath) and a borderless, wider card so
+   it reads as a full welcome screen rather than a pop-up. */
+.tour-backdrop.firstrun {
+  background: var(--paper);
+}
+.tour-backdrop.firstrun .tour {
+  max-width: 620px;
+  border: none;
+  box-shadow: none;
+}
+.tour {
+  background: var(--surface);
+  color: var(--ink);
+  border: 2px solid var(--action);
+  border-radius: var(--radius);
+  box-shadow: var(--elev);
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.tour-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tour-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--action);
+}
+.tour .steps {
+  margin: 0;
+}
+.tour-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tour-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+.tour-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+}
+/* Focused programmatically so screen readers announce it — no visible ring. */
+.tour-title:focus {
+  outline: none;
+}
+.tour-text {
+  font-size: 1.08rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+html[data-contrast="high"] .tour-text {
+  color: var(--ink);
+}
+/* Voice-command hint (shown when hands-free voice control is on) */
+.tour-voicehint {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  background: var(--action-tint);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--action);
+}
+html[data-contrast="high"] .tour-voicehint {
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.tour-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tour-actions .btn {
+  flex: 1 1 auto;
+}
+.tour-actions-welcome {
+  flex-direction: column;
+  align-items: stretch;
+}
+.tour-actions-welcome .tour-blind {
+  width: 100%;
+}
+.tour-hint {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: -6px 0 2px;
+}
+html[data-contrast="high"] .tour-hint {
+  color: var(--ink);
+}
+.tour-actions-row {
+  display: flex;
+  gap: 12px;
+}
+.tour-actions-row .btn {
+  flex: 1;
+}
+/* Smart high-contrast suggestion (welcome step, OS-preference driven) */
+.tour-suggest {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--action);
+  border-radius: var(--radius);
+  background: var(--action-tint);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+/* Keyboard hint footer — always visible so keyboard users know the controls */
+.tour-kbd {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: center;
+}
+html[data-contrast="high"] .tour-kbd {
+  color: var(--ink);
+}
+
 /* ============================================================
    Voice agent (OpenAI Realtime) — floating launcher + panel
    ============================================================ */
@@ -1778,6 +2041,144 @@ html[data-contrast="high"] .voice-fab {
   .robot-antenna::after,
   .voice-robot.live .robot-mouth span { animation: none; }
 }
+/* ---- Voice orb: mic in a "listening" ring — civic-minimal adaptation of the
+   reference (single --action accent, sharp, NO glow/gradient/glass). Concentric
+   rings ripple outward only while live; the disc breathes. ---- */
+.voice-orb {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  margin: 8px auto 20px;
+  display: grid;
+  place-items: center;
+}
+.voice-orb-ring {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  border: 2px solid var(--action);
+  border-radius: 50%;
+  opacity: 0;
+}
+.voice-orb.live .voice-orb-ring {
+  animation: voice-ripple 2s ease-out infinite;
+}
+.voice-orb.live .voice-orb-ring:nth-child(2) {
+  animation-delay: 1s;
+}
+@keyframes voice-ripple {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+.voice-orb-core {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--action);
+  color: var(--action);
+  display: grid;
+  place-items: center;
+}
+.voice-orb.live .voice-orb-core {
+  background: var(--action);
+  color: var(--action-ink);
+  animation: voice-breathe 2s ease-in-out infinite;
+}
+.voice-orb.connecting .voice-orb-core {
+  animation: voice-breathe 1s ease-in-out infinite;
+}
+.voice-orb.error .voice-orb-core {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+@keyframes voice-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+.voice-orb-mic {
+  width: 40px;
+  height: 40px;
+  transform-origin: center;
+}
+/* The mic glyph itself "listens" — a gentle pulse while active
+   (transform/opacity only; matches the reference's living mic, our palette). */
+.voice-orb.live .voice-orb-mic {
+  animation: mic-pulse 1.4s ease-in-out infinite;
+}
+.voice-orb.connecting .voice-orb-mic {
+  animation: mic-pulse 0.9s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.14);
+    opacity: 1;
+  }
+}
+html[data-contrast="high"] .voice-orb-core {
+  border-width: 3px;
+}
+/* Rotating single-hue accent arc — echoes the reference's orbiting light in our
+   one blue accent: a solid stroked arc (no neon/gradient/glow) that circles the
+   mic while active. */
+.voice-orb-arc {
+  position: absolute;
+  width: 116px;
+  height: 116px;
+  opacity: 0;
+  transform-origin: center;
+  pointer-events: none;
+}
+.voice-orb-arc circle {
+  fill: none;
+  stroke: var(--action);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 70 220;
+}
+.voice-orb.live .voice-orb-arc,
+.voice-orb.connecting .voice-orb-arc {
+  opacity: 1;
+  animation: orb-spin 3.5s linear infinite;
+}
+.voice-orb.connecting .voice-orb-arc {
+  animation-duration: 1.2s;
+}
+.voice-orb.error .voice-orb-arc {
+  opacity: 0;
+}
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-orb.live .voice-orb-ring,
+  .voice-orb-core,
+  .voice-orb-mic,
+  .voice-orb-arc {
+    animation: none !important;
+  }
+}
+
 .voice-panel-head {
   display: flex;
   align-items: center;

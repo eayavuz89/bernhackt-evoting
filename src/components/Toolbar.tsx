@@ -10,7 +10,7 @@ const PROFILES: Profile[] = ["standard", "blind", "motor", "cognitive", "senior"
 // toggling a role="group" panel (NOT role="menu" — the panel holds form controls,
 // not command menuitems). Escape + outside-click close; focus moves into the
 // panel on open and returns to the trigger on Escape.
-export default function Toolbar() {
+export default function Toolbar({ onOpenTutorial }: { onOpenTutorial: () => void }) {
   const a = useA11y();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -163,6 +163,37 @@ export default function Toolbar() {
               }}
             >
               <span aria-hidden="true">🔊</span> {a.readAloud ? a.tr("readAloudOn") : a.tr("readAloudOff")}
+            </button>
+
+            <button
+              type="button"
+              className="toggle"
+              aria-pressed={a.soundCues}
+              onClick={() => a.setSoundCues(!a.soundCues)}
+            >
+              <span aria-hidden="true">🎵</span> {a.soundCues ? a.tr("soundCuesOn") : a.tr("soundCuesOff")}
+            </button>
+
+            <button
+              type="button"
+              className="toggle"
+              aria-pressed={a.voiceControl}
+              onClick={() => a.setVoiceControl(!a.voiceControl)}
+            >
+              <span aria-hidden="true">🎙️</span> {a.voiceControl ? a.tr("voiceControlOn") : a.tr("voiceControlOff")}
+            </button>
+
+            <hr className="a11y-menu-sep" />
+
+            <button
+              type="button"
+              className="toggle"
+              onClick={() => {
+                onOpenTutorial();
+                close();
+              }}
+            >
+              <span aria-hidden="true">▶</span> {a.tr("tutorial.reopen")}
             </button>
           </div>
         </div>

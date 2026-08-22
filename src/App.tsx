@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Toolbar from "./components/Toolbar";
 import VoiceAgent from "./components/VoiceAgent";
+import OnboardingTour from "./components/OnboardingTour";
 import { useA11y } from "./context/AccessibilityContext";
 import ProfileSelect from "./screens/ProfileSelect";
 import Login from "./screens/Login";
@@ -21,6 +22,8 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  // Welcome tour: auto-opens on first visit; re-openable from the a11y menu.
+  const [tourOpen, setTourOpen] = useState(!a.onboardingSeen);
 
   // Refs so voice-agent tool calls always read the latest state.
   const answersRef = useRef(answers);
@@ -90,7 +93,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         {a.tr("skipToMain")}
       </a>
-      {!isCard && <Toolbar />}
+      {!isCard && <Toolbar onOpenTutorial={() => setTourOpen(true)} />}
       <main id="main" className={isCard ? "main main-card" : "main"} tabIndex={-1}>
         <Routes>
           <Route path="/" element={<ProfileSelect />} />
@@ -102,6 +105,16 @@ export default function App() {
           <Route path="/card" element={<VotingCard />} />
         </Routes>
       </main>
+      {!isCard && tourOpen && (
+        <OnboardingTour
+          firstRun={!a.onboardingSeen}
+          onClose={() => {
+            setTourOpen(false);
+            a.setOnboardingSeen(true);
+            a.stopSpeak();
+          }}
+        />
+      )}
       {!isCard && <VoiceAgent />}
     </>
   );

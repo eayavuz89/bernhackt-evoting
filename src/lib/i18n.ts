@@ -18,6 +18,21 @@ const de: Dict = {
   readAloud: "Vorlesen",
   readAloudOn: "Vorlesen ein",
   readAloudOff: "Vorlesen aus",
+  soundCues: "Tonsignale",
+  soundCuesOn: "Tonsignale ein",
+  soundCuesOff: "Tonsignale aus",
+  voiceControl: "Sprachsteuerung",
+  voiceControlOn: "Sprachsteuerung ein",
+  voiceControlOff: "Sprachsteuerung aus",
+  "tutorial.voiceHint": "Sagen Sie «weiter», «zurück» oder «wiederholen».",
+  "practice.open": "Üben",
+  "practice.title": "Übungsmodus",
+  "practice.intro": "Dies ist eine Übung. Ihre Stimme zählt nicht — probieren Sie es gefahrlos aus.",
+  "practice.question": "Beispiel: Soll der Dorfplatz begrünt werden?",
+  "practice.feedback": "nur eine Übung, wird nicht gezählt.",
+  "practice.feedbackSpoken": "Das war eine Übung. Ihre Stimme wurde nicht gespeichert.",
+  "practice.again": "Nochmal",
+  "practice.done": "Fertig",
   easyLanguage: "Leichte Sprache",
   on: "Ein",
   off: "Aus",
@@ -142,6 +157,36 @@ const de: Dict = {
   voiceCapped: "Das Gespräch wurde nach 3 Minuten automatisch beendet.",
   voiceEnableSound: "Ton aktivieren",
   close: "Schliessen",
+  // onboarding tour
+  "tutorial.label": "Anleitung",
+  "tutorial.reopen": "Anleitung ansehen",
+  "tutorial.blindMode": "Blinden-Modus aktivieren",
+  "tutorial.blindModeHint": "Vorlesen und hoher Kontrast",
+  "tutorial.start": "Anleitung starten",
+  "tutorial.skip": "Überspringen",
+  "tutorial.repeat": "Vorlesen",
+  "tutorial.finish": "Los geht's",
+  "tutorial.s1.title": "Willkommen bei StimmZugang",
+  "tutorial.s1.body":
+    "Barrierefreies E-Voting für alle. Diese App kann alles vorlesen und führt Sie Schritt für Schritt durch die Stimmabgabe.",
+  "tutorial.s2.title": "Barrierefreiheit einstellen",
+  "tutorial.s2.body":
+    "Oben rechts finden Sie den Knopf «Barrierefreiheit». Dort schalten Sie Vorlesen und hohen Kontrast ein, ändern die Textgrösse und die Sprache: Deutsch, Français, Italiano, English.",
+  "tutorial.s3.title": "Ansicht wählen",
+  "tutorial.s3.body":
+    "Auf der Startseite wählen Sie eine Ansicht: Standard, Blind, Motorisch eingeschränkt, Einfache Sprache oder Grosse Ansicht. Jede stellt die App passend für Sie ein.",
+  "tutorial.s4.title": "So läuft die Abstimmung",
+  "tutorial.s4.body":
+    "In fünf Schritten: 1. Anmelden mit dem Stimmrechtsausweis. 2. Vorlagen beantworten. 3. Prüfcodes mit dem Ausweis vergleichen. 4. Bestätigen. 5. Fertig.",
+  "tutorial.s5.title": "Sprachassistent und Hilfe",
+  "tutorial.s5.body":
+    "Unten rechts hilft Ihnen der Sprachassistent per Stimme. Diese Anleitung können Sie jederzeit im Menü «Barrierefreiheit» erneut öffnen.",
+  "tutorial.s6.title": "Warum ist das sicher?",
+  "tutorial.s6.body":
+    "Ihre Stimme ist geheim. Vor dem Senden wird sie verschlüsselt. Danach vergleichen Sie Prüfcodes mit Ihrem Ausweis — so sehen Sie, dass Ihre Stimme korrekt und unverändert angekommen ist.",
+  "tutorial.keyboard": "Tastatur: Tab bewegt, Enter wählt, Escape schliesst.",
+  "tutorial.suggestContrast": "Ihr System bevorzugt hohen Kontrast.",
+  "tutorial.suggestContrastBtn": "Hohen Kontrast aktivieren",
 };
 
 const en: Dict = {
@@ -156,6 +201,21 @@ const en: Dict = {
   readAloud: "Read aloud",
   readAloudOn: "Read aloud on",
   readAloudOff: "Read aloud off",
+  soundCues: "Sound cues",
+  soundCuesOn: "Sound cues on",
+  soundCuesOff: "Sound cues off",
+  voiceControl: "Voice control",
+  voiceControlOn: "Voice control on",
+  voiceControlOff: "Voice control off",
+  "tutorial.voiceHint": "Say «next», «back» or «repeat».",
+  "practice.open": "Practice",
+  "practice.title": "Practice mode",
+  "practice.intro": "This is practice. Your vote does not count — try it safely.",
+  "practice.question": "Example: Should the village square be greened?",
+  "practice.feedback": "just practice, not counted.",
+  "practice.feedbackSpoken": "That was practice. Your vote was not saved.",
+  "practice.again": "Again",
+  "practice.done": "Done",
   easyLanguage: "Easy language",
   on: "On",
   off: "Off",
@@ -269,10 +329,62 @@ const en: Dict = {
   voiceCapped: "The conversation was automatically ended after 3 minutes.",
   voiceEnableSound: "Enable sound",
   close: "Close",
+  // onboarding tour
+  "tutorial.label": "Tutorial",
+  "tutorial.reopen": "View tutorial",
+  "tutorial.blindMode": "Enable blind mode",
+  "tutorial.blindModeHint": "Read-aloud and high contrast",
+  "tutorial.start": "Start tutorial",
+  "tutorial.skip": "Skip",
+  "tutorial.repeat": "Read aloud",
+  "tutorial.finish": "Let's go",
+  "tutorial.s1.title": "Welcome to StimmZugang",
+  "tutorial.s1.body":
+    "Barrier-free e-voting for everyone. This app can read everything aloud and guides you step by step through casting your vote.",
+  "tutorial.s2.title": "Set up accessibility",
+  "tutorial.s2.body":
+    "Top right you find the “Accessibility” button. There you turn on read-aloud and high contrast, change the text size and the language: Deutsch, Français, Italiano, English.",
+  "tutorial.s3.title": "Choose a view",
+  "tutorial.s3.body":
+    "On the start page you choose a view: Standard, Blind, Motor impairment, Easy language or Large view. Each one sets the app up to suit you.",
+  "tutorial.s4.title": "How voting works",
+  "tutorial.s4.body":
+    "In five steps: 1. Sign in with your voting card. 2. Answer the proposals. 3. Compare the verification codes with your card. 4. Confirm. 5. Done.",
+  "tutorial.s5.title": "Voice assistant and help",
+  "tutorial.s5.body":
+    "Bottom right, the voice assistant helps you by voice. You can reopen this tutorial any time from the “Accessibility” menu.",
+  "tutorial.s6.title": "Why is this safe?",
+  "tutorial.s6.body":
+    "Your vote is secret. It is encrypted before it is sent. Afterwards you compare verification codes with your card — so you can see your vote arrived correctly and unchanged.",
+  "tutorial.keyboard": "Keyboard: Tab moves, Enter selects, Escape closes.",
+  "tutorial.suggestContrast": "Your system prefers high contrast.",
+  "tutorial.suggestContrastBtn": "Enable high contrast",
 };
 
 const fr: Dict = {
   ...en,
+  // controls + practice + tour keys that need French (fall back to English otherwise)
+  soundCues: "Signaux sonores",
+  soundCuesOn: "Signaux sonores activés",
+  soundCuesOff: "Signaux sonores désactivés",
+  voiceControl: "Commande vocale",
+  voiceControlOn: "Commande vocale activée",
+  voiceControlOff: "Commande vocale désactivée",
+  "tutorial.voiceHint": "Dites « suivant », « retour » ou « répéter ».",
+  "tutorial.keyboard": "Clavier : Tab déplace, Entrée choisit, Échap ferme.",
+  "tutorial.suggestContrast": "Votre système préfère un contraste élevé.",
+  "tutorial.suggestContrastBtn": "Activer le contraste élevé",
+  "tutorial.s6.title": "Pourquoi est-ce sûr ?",
+  "tutorial.s6.body":
+    "Votre vote est secret. Il est chiffré avant l'envoi. Ensuite, vous comparez les codes de vérification avec votre carte — vous voyez ainsi que votre vote est arrivé correctement et sans modification.",
+  "practice.open": "S'exercer",
+  "practice.title": "Mode entraînement",
+  "practice.intro": "Ceci est un entraînement. Votre vote ne compte pas — essayez sans risque.",
+  "practice.question": "Exemple : faut-il végétaliser la place du village ?",
+  "practice.feedback": "juste un entraînement, non comptabilisé.",
+  "practice.feedbackSpoken": "C'était un entraînement. Votre vote n'a pas été enregistré.",
+  "practice.again": "Encore",
+  "practice.done": "Terminé",
   appName: "AccessVote",
   tagline: "Vote électronique sans barrières pour tous",
   skipToMain: "Aller au contenu principal",
@@ -400,10 +512,56 @@ const fr: Dict = {
   voiceCapped: "La conversation a été automatiquement terminée après 3 minutes.",
   voiceEnableSound: "Activer le son",
   close: "Fermer",
+  // onboarding tour
+  "tutorial.label": "Guide",
+  "tutorial.reopen": "Voir le guide",
+  "tutorial.blindMode": "Activer le mode aveugle",
+  "tutorial.blindModeHint": "Lecture à voix haute et contraste élevé",
+  "tutorial.start": "Démarrer le guide",
+  "tutorial.skip": "Passer",
+  "tutorial.repeat": "Lire à voix haute",
+  "tutorial.finish": "C'est parti",
+  "tutorial.s1.title": "Bienvenue sur StimmZugang",
+  "tutorial.s1.body":
+    "Vote électronique sans barrières pour tous. Cette application peut tout lire à voix haute et vous guide pas à pas dans l'expression de votre vote.",
+  "tutorial.s2.title": "Régler l'accessibilité",
+  "tutorial.s2.body":
+    "En haut à droite se trouve le bouton « Accessibilité ». Vous y activez la lecture à voix haute et le contraste élevé, changez la taille du texte et la langue : Deutsch, Français, Italiano, English.",
+  "tutorial.s3.title": "Choisir une vue",
+  "tutorial.s3.body":
+    "Sur la page d'accueil, choisissez une vue : Standard, Aveugle, Handicap moteur, Langage simplifié ou Grand affichage. Chacune configure l'application pour vous.",
+  "tutorial.s4.title": "Déroulement du vote",
+  "tutorial.s4.body":
+    "En cinq étapes : 1. Se connecter avec la carte de vote. 2. Répondre aux objets. 3. Comparer les codes de vérification avec la carte. 4. Confirmer. 5. Terminé.",
+  "tutorial.s5.title": "Assistant vocal et aide",
+  "tutorial.s5.body":
+    "En bas à droite, l'assistant vocal vous aide par la voix. Vous pouvez rouvrir ce guide à tout moment depuis le menu « Accessibilité ».",
 };
 
 const it: Dict = {
   ...en,
+  // controls + practice + tour keys that need Italian (fall back to English otherwise)
+  soundCues: "Segnali acustici",
+  soundCuesOn: "Segnali acustici attivati",
+  soundCuesOff: "Segnali acustici disattivati",
+  voiceControl: "Comando vocale",
+  voiceControlOn: "Comando vocale attivato",
+  voiceControlOff: "Comando vocale disattivato",
+  "tutorial.voiceHint": "Dica «avanti», «indietro» o «ripeti».",
+  "tutorial.keyboard": "Tastiera: Tab si sposta, Invio sceglie, Esc chiude.",
+  "tutorial.suggestContrast": "Il suo sistema preferisce un contrasto elevato.",
+  "tutorial.suggestContrastBtn": "Attiva il contrasto elevato",
+  "tutorial.s6.title": "Perché è sicuro?",
+  "tutorial.s6.body":
+    "Il suo voto è segreto. Viene cifrato prima dell'invio. Poi confronta i codici di verifica con la sua carta — così vede che il suo voto è arrivato correttamente e senza modifiche.",
+  "practice.open": "Esercitati",
+  "practice.title": "Modalità esercizio",
+  "practice.intro": "Questo è un esercizio. Il suo voto non conta — provi senza rischi.",
+  "practice.question": "Esempio: la piazza del paese deve essere resa verde?",
+  "practice.feedback": "solo un esercizio, non conteggiato.",
+  "practice.feedbackSpoken": "Era un esercizio. Il suo voto non è stato salvato.",
+  "practice.again": "Ancora",
+  "practice.done": "Fatto",
   appName: "AccessVote",
   tagline: "Voto elettronico senza barriere per tutti",
   skipToMain: "Vai al contenuto principale",
@@ -532,6 +690,30 @@ const it: Dict = {
   voiceCapped: "La conversazione è stata terminata automaticamente dopo 3 minuti.",
   voiceEnableSound: "Attiva l'audio",
   close: "Chiudi",
+  // onboarding tour
+  "tutorial.label": "Guida",
+  "tutorial.reopen": "Vedi la guida",
+  "tutorial.blindMode": "Attiva la modalità per ciechi",
+  "tutorial.blindModeHint": "Lettura ad alta voce e contrasto elevato",
+  "tutorial.start": "Avvia la guida",
+  "tutorial.skip": "Salta",
+  "tutorial.repeat": "Leggi ad alta voce",
+  "tutorial.finish": "Iniziamo",
+  "tutorial.s1.title": "Benvenuto su StimmZugang",
+  "tutorial.s1.body":
+    "Voto elettronico senza barriere per tutti. Questa app può leggere tutto ad alta voce e la guida passo dopo passo nell'espressione del voto.",
+  "tutorial.s2.title": "Impostare l'accessibilità",
+  "tutorial.s2.body":
+    "In alto a destra si trova il pulsante «Accessibilità». Lì attiva la lettura ad alta voce e il contrasto elevato, cambia la dimensione del testo e la lingua: Deutsch, Français, Italiano, English.",
+  "tutorial.s3.title": "Scegliere una vista",
+  "tutorial.s3.body":
+    "Nella pagina iniziale sceglie una vista: Standard, Cieco, Disabilità motoria, Linguaggio semplice o Visualizzazione grande. Ognuna configura l'app su misura per lei.",
+  "tutorial.s4.title": "Come si svolge la votazione",
+  "tutorial.s4.body":
+    "In cinque passaggi: 1. Accedere con la carta di voto. 2. Rispondere agli oggetti. 3. Confrontare i codici di verifica con la carta. 4. Confermare. 5. Fatto.",
+  "tutorial.s5.title": "Assistente vocale e aiuto",
+  "tutorial.s5.body":
+    "In basso a destra, l'assistente vocale la aiuta con la voce. Può riaprire questa guida in qualsiasi momento dal menu «Accessibilità».",
 };
 
 // Leichte Sprache (easy German) overlay — only the keys that benefit from simpler wording.
@@ -549,6 +731,26 @@ const deLeicht: Dict = {
   confirmHelp: "Auf Ihrem Ausweis steht noch ein Code. Tippen Sie diesen Code ein. Dann geht Ihre Stimme ab.",
   doneTitle: "Danke. Ihre Stimme ist abgegeben.",
   doneHelp: "Auf dem Bildschirm steht ein letzter Code. Der Code steht auch auf Ihrem Ausweis.",
+  // onboarding tour — simpler wording
+  "tutorial.blindMode": "Modus für Blinde",
+  "tutorial.s1.title": "Willkommen",
+  "tutorial.s1.body":
+    "Das ist StimmZugang. Hier stimmen Sie ab. Die App liest alles vor. Die App hilft Ihnen Schritt für Schritt.",
+  "tutorial.s2.title": "Einstellungen",
+  "tutorial.s2.body":
+    "Oben rechts ist ein Knopf. Der Knopf heisst «Barrierefreiheit». Dort gibt es: Vorlesen. Grosse Schrift. Hoher Kontrast. Andere Sprache.",
+  "tutorial.s3.title": "Ansicht wählen",
+  "tutorial.s3.body":
+    "Wählen Sie eine Ansicht. Zum Beispiel: Blind. Oder: Grosse Ansicht. Die App passt sich dann an.",
+  "tutorial.s4.title": "So geht Abstimmen",
+  "tutorial.s4.body":
+    "Es gibt 5 Schritte. 1. Anmelden. 2. Fragen beantworten. 3. Codes vergleichen. 4. Bestätigen. 5. Fertig.",
+  "tutorial.s5.title": "Hilfe",
+  "tutorial.s5.body":
+    "Unten rechts ist ein Sprach-Helfer. Sie können mit ihm sprechen. Diese Anleitung finden Sie immer im Menü «Barrierefreiheit».",
+  "tutorial.s6.title": "Ist das sicher?",
+  "tutorial.s6.body":
+    "Ja. Ihre Stimme ist geheim. Ihre Stimme wird verschlüsselt. Danach prüfen Sie Codes. So wissen Sie: Alles ist richtig.",
 };
 
 const dicts: Record<Lang, Dict> = { de, fr, it, en };

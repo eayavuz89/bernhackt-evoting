@@ -270,22 +270,30 @@ export default function VoiceAgent() {
             </button>
           </div>
 
-          {/* Talking robot — decorative; reacts to status (idle blinks, live talks) */}
-          <div className={"voice-robot " + status} aria-hidden="true">
-            <span className="robot-antenna" />
-            <div className="robot-head">
-              <div className="robot-eyes">
-                <span className="robot-eye" />
-                <span className="robot-eye" />
-              </div>
-              <div className="robot-mouth">
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
-            </div>
+          {/* Voice orb — mic in a "listening" ring; rings ripple + accent arc
+              orbits while live */}
+          <div className={"voice-orb " + status} aria-hidden="true">
+            <span className="voice-orb-ring" />
+            <span className="voice-orb-ring" />
+            <span className="voice-orb-core">
+              <svg
+                className="voice-orb-mic"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+                <line x1="12" y1="18" x2="12" y2="22" />
+              </svg>
+            </span>
+            <svg className="voice-orb-arc" viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="50" cy="50" r="46" />
+            </svg>
           </div>
 
           {error ? (
