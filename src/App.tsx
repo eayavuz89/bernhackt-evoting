@@ -94,7 +94,11 @@ export default function App() {
         {a.tr("skipToMain")}
       </a>
       {!isCard && <Toolbar onOpenTutorial={() => setTourOpen(true)} />}
-      <main id="main" className={isCard ? "main main-card" : "main"} tabIndex={-1}>
+      <main
+        id="main"
+        className={isCard ? "main main-card" : location.pathname === "/" ? "main main-home" : "main"}
+        tabIndex={-1}
+      >
         <Routes>
           <Route path="/" element={<ProfileSelect />} />
           <Route path="/login" element={<Login />} />
@@ -112,6 +116,16 @@ export default function App() {
             setTourOpen(false);
             a.setOnboardingSeen(true);
             a.stopSpeak();
+          }}
+          onChooseProfile={() => {
+            // "Otherwise choose your profile": close the tour and move focus to the
+            // profile cards on the home screen so the user picks their mode there.
+            setTourOpen(false);
+            a.setOnboardingSeen(true);
+            a.stopSpeak();
+            requestAnimationFrame(() =>
+              document.querySelector<HTMLElement>(".profile-card")?.focus()
+            );
           }}
         />
       )}

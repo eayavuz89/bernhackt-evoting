@@ -500,6 +500,26 @@ html[data-contrast="high"] .home-bg {
   max-width: none;
   padding: 0;
 }
+/* Home fills the viewport height so the CTA row anchors consistently at the
+   bottom instead of floating with a variable empty band on tall/short windows —
+   same vertical rhythm at every size. Scoped to the home route only. */
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.main-home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* Centre the content block vertically so it sits with the SAME rhythm at every
+   window height — no variable empty band at the bottom, and no clipping on short
+   windows (margin-block:auto collapses to 0 and the page scrolls normally). */
+.main-home .screen {
+  margin-block: auto;
+}
 .eyebrow {
   font-size: 0.72rem;
   font-weight: 700;
@@ -533,8 +553,6 @@ html[data-contrast="high"] .eyebrow {
   color: var(--ink);
   font-weight: 600;
   margin: 0 0 22px;
-  padding-left: 14px;
-  border-left: 3px solid var(--action);
 }
 
 /* Profile picker: keep the WHOLE chooser at the Standard (1.0) size no matter
@@ -780,8 +798,8 @@ html[data-contrast="high"] .btn-cast {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 22px;
-  min-height: 9.75em; /* a bit taller / airier */
+  padding: 24px;
+  min-height: 10.75em; /* taller so the description sits lower with air above */
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -818,10 +836,10 @@ html[data-contrast="high"] .profile-card.selected {
 }
 .profile-icon {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 2.5em;
-  height: 2.5em;
+  top: 18px;
+  right: 18px;
+  width: 3.1em;
+  height: 3.1em;
   line-height: 1;
 }
 .profile-icon svg {
@@ -837,13 +855,17 @@ html[data-contrast="high"] .profile-icon {
   padding: 3px;
 }
 .profile-name {
-  font-size: 1.12em;
+  font-size: 1.16em;
   font-weight: 800;
-  padding-right: 3.4em; /* keep the title clear of the top-right icon (not cramped) */
+  letter-spacing: -0.01em;
+  padding-right: 3.9em; /* keep the title clear of the (now larger) top-right icon */
 }
 .profile-desc {
+  margin-top: auto; /* push the description to a shared baseline near the card foot */
+  padding-top: 6px;
   color: var(--ink-soft);
   font-size: 0.95em;
+  line-height: 1.5;
 }
 
 /* ---------------- Forms ---------------- */
@@ -2041,63 +2063,97 @@ html[data-contrast="high"] .voice-fab {
   .robot-antenna::after,
   .voice-robot.live .robot-mouth span { animation: none; }
 }
-/* ---- Voice orb: mic in a "listening" ring — civic-minimal adaptation of the
-   reference (single --action accent, sharp, NO glow/gradient/glass). Concentric
-   rings ripple outward only while live; the disc breathes. ---- */
+/* ---- Voice orb — Siri-style glowing assistant halo.
+   DELIBERATE, Joker-approved deviation (2026-08-22): the frontend-build-standard
+   "no glow / gradient / glassmorphism" rule is intentionally relaxed for THIS one
+   component to match the requested reference (Pinterest voice-assistant orb).
+   Everything outside the orb stays civic/sharp. Guardrails kept: all motion is
+   transform/opacity only and stops fully under reduced-motion; the mic glyph is
+   high-contrast white; high-contrast mode swaps the blur for a crisp solid ring. */
 .voice-orb {
   position: relative;
-  width: 132px;
-  height: 132px;
-  margin: 8px auto 20px;
+  width: 150px;
+  height: 150px;
+  margin: 6px auto 20px;
   display: grid;
   place-items: center;
 }
+/* Two halo layers share one conic sweep (violet → indigo → blue → cyan); they sit
+   BEHIND the opaque core (earlier siblings), so only the glowing rim shows. */
 .voice-orb-ring {
   position: absolute;
-  width: 96px;
-  height: 96px;
-  border: 2px solid var(--action);
   border-radius: 50%;
-  opacity: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from 130deg,
+    rgba(124, 58, 237, 0) 0deg,
+    #7c3aed 55deg,
+    #4f46e5 105deg,
+    #2563eb 150deg,
+    #22d3ee 205deg,
+    #38bdf8 245deg,
+    rgba(56, 189, 248, 0) 305deg,
+    rgba(124, 58, 237, 0) 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 54%, #000 61%);
+  mask: radial-gradient(circle, transparent 54%, #000 61%);
 }
+.voice-orb-ring:nth-child(1) {
+  width: 118px;
+  height: 118px;
+  filter: blur(6px);
+  opacity: 0.95;
+}
+.voice-orb-ring:nth-child(2) {
+  width: 148px;
+  height: 148px;
+  filter: blur(18px);
+  opacity: 0.5;
+}
+/* Halo idles still; it rotates while connecting / live (two layers counter-spin). */
+.voice-orb.connecting .voice-orb-ring,
 .voice-orb.live .voice-orb-ring {
-  animation: voice-ripple 2s ease-out infinite;
+  animation: orb-spin 6s linear infinite;
 }
+.voice-orb.connecting .voice-orb-ring:nth-child(2),
 .voice-orb.live .voice-orb-ring:nth-child(2) {
-  animation-delay: 1s;
+  animation-direction: reverse;
+  animation-duration: 9s;
 }
-@keyframes voice-ripple {
-  0% {
-    transform: scale(0.72);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
+.voice-orb.connecting .voice-orb-ring {
+  animation-duration: 2.6s;
 }
+/* Error → calm red glow instead of the colourful sweep (status stays legible). */
+.voice-orb.error .voice-orb-ring {
+  background: conic-gradient(
+    from 130deg,
+    rgba(179, 38, 30, 0) 0deg,
+    #b3261e 140deg,
+    #e5484d 210deg,
+    rgba(179, 38, 30, 0) 320deg
+  );
+  animation: none;
+}
+/* Dark orb core holding the white mic. */
 .voice-orb-core {
   position: relative;
+  z-index: 1;
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: var(--surface);
-  border: 2px solid var(--action);
-  color: var(--action);
+  background: radial-gradient(circle at 50% 42%, #232a63 0%, #141a45 55%, #0b0f30 100%);
+  color: #ffffff;
   display: grid;
   place-items: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 .voice-orb.live .voice-orb-core {
-  background: var(--action);
-  color: var(--action-ink);
-  animation: voice-breathe 2s ease-in-out infinite;
+  animation: voice-breathe 2.4s ease-in-out infinite;
 }
 .voice-orb.connecting .voice-orb-core {
-  animation: voice-breathe 1s ease-in-out infinite;
-}
-.voice-orb.error .voice-orb-core {
-  border-color: var(--danger);
-  color: var(--danger);
+  animation: voice-breathe 1.2s ease-in-out infinite;
 }
 @keyframes voice-breathe {
   0%,
@@ -2105,16 +2161,16 @@ html[data-contrast="high"] .voice-fab {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.04);
   }
 }
 .voice-orb-mic {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   transform-origin: center;
+  filter: drop-shadow(0 0 6px rgba(130, 175, 255, 0.5));
 }
-/* The mic glyph itself "listens" — a gentle pulse while active
-   (transform/opacity only; matches the reference's living mic, our palette). */
+/* The mic glyph itself "listens" — a gentle pulse while active (transform/opacity). */
 .voice-orb.live .voice-orb-mic {
   animation: mic-pulse 1.4s ease-in-out infinite;
 }
@@ -2125,33 +2181,45 @@ html[data-contrast="high"] .voice-fab {
   0%,
   100% {
     transform: scale(1);
-    opacity: 0.85;
+    opacity: 0.9;
   }
   50% {
-    transform: scale(1.14);
+    transform: scale(1.12);
     opacity: 1;
   }
 }
-html[data-contrast="high"] .voice-orb-core {
-  border-width: 3px;
+/* High-contrast: drop the blur/bloom for a crisp solid rim + defined orb so
+   low-vision users get a sharp shape, not a haze. */
+html[data-contrast="high"] .voice-orb-ring {
+  filter: none;
+  -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%);
+  mask: radial-gradient(circle, transparent 62%, #000 64%);
+  opacity: 1;
 }
-/* Rotating single-hue accent arc — echoes the reference's orbiting light in our
-   one blue accent: a solid stroked arc (no neon/gradient/glow) that circles the
-   mic while active. */
+html[data-contrast="high"] .voice-orb-ring:nth-child(2) {
+  display: none;
+}
+html[data-contrast="high"] .voice-orb-core {
+  background: #0b0f30;
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+/* Bright leading highlight tracing the halo while active (the "listening" light);
+   sits above the core, hidden at idle / error. */
 .voice-orb-arc {
   position: absolute;
-  width: 116px;
-  height: 116px;
+  width: 104px;
+  height: 104px;
   opacity: 0;
   transform-origin: center;
   pointer-events: none;
 }
 .voice-orb-arc circle {
   fill: none;
-  stroke: var(--action);
-  stroke-width: 3;
+  stroke: #eaf6ff;
+  stroke-width: 2.5;
   stroke-linecap: round;
-  stroke-dasharray: 70 220;
+  stroke-dasharray: 28 260;
+  filter: drop-shadow(0 0 4px rgba(160, 220, 255, 0.9));
 }
 .voice-orb.live .voice-orb-arc,
 .voice-orb.connecting .voice-orb-arc {
@@ -2171,7 +2239,7 @@ html[data-contrast="high"] .voice-orb-core {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .voice-orb.live .voice-orb-ring,
+  .voice-orb-ring,
   .voice-orb-core,
   .voice-orb-mic,
   .voice-orb-arc {

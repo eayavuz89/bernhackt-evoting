@@ -281,14 +281,15 @@ export default function VoiceAgent() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.9"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
-                <line x1="12" y1="18" x2="12" y2="22" />
+                {/* rounded stadium capsule + U-shaped stand + short stem (Siri-style) */}
+                <rect x="9" y="2.5" width="6" height="11" rx="3" />
+                <path d="M6.5 11a5.5 5.5 0 0 0 11 0" />
+                <line x1="12" y1="16.5" x2="12" y2="20.5" />
               </svg>
             </span>
             <svg className="voice-orb-arc" viewBox="0 0 100 100" aria-hidden="true">

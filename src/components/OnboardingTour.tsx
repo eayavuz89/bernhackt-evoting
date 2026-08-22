@@ -22,9 +22,11 @@ const BG_SELECTORS = ["#main", "header.toolbar", ".voice-fab"];
 
 export default function OnboardingTour({
   onClose,
+  onChooseProfile,
   firstRun = false,
 }: {
   onClose: () => void;
+  onChooseProfile?: () => void;
   firstRun?: boolean;
 }) {
   const a = useA11y();
@@ -40,6 +42,7 @@ export default function OnboardingTour({
   );
   const dialogRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const blindBtnRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -116,6 +119,31 @@ export default function OnboardingTour({
   useEffect(() => {
     playEarcon("step");
   }, [step]);
+
+  // First run only: greet by voice the instant the screen opens and move focus to
+  // the blind-mode button, so a blind user HEARS the question and confirms with
+  // Enter — without hunting for a control they cannot see.
+  useEffect(() => {
+    if (!firstRun) return;
+    let greeted = false;
+    const greet = () => {
+      if (greeted) return;
+      greeted = true;
+      a.speak(a.tr("tutorial.autoWelcome"));
+    };
+    const t = setTimeout(greet, 350); // most desktop browsers allow TTS on load
+    // Autoplay guard: if speech was blocked on load, fire on the first input.
+    const onGesture = () => greet();
+    window.addEventListener("pointerdown", onGesture, { once: true });
+    window.addEventListener("keydown", onGesture, { once: true });
+    blindBtnRef.current?.focus();
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("keydown", onGesture);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firstRun]);
 
   // Hands-free navigation: speak "weiter / zurück / wiederholen" to move around.
   useVoiceCommands(a.voiceControl, a.lang, {
@@ -207,6 +235,7 @@ export default function OnboardingTour({
             )}
             <button
               type="button"
+              ref={blindBtnRef}
               className="btn btn-primary tour-blind"
               onClick={() => {
                 a.setProfile("blind");
@@ -217,11 +246,15 @@ export default function OnboardingTour({
             </button>
             <span className="tour-hint">{a.tr("tutorial.blindModeHint")}</span>
             <div className="tour-actions-row">
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => (onChooseProfile ?? onClose)()}
+              >
+                <span aria-hidden="true">☰</span> {a.tr("tutorial.chooseProfile")}
+              </button>
               <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>
                 <span aria-hidden="true">▶</span> {a.tr("tutorial.start")}
-              </button>
-              <button type="button" className="btn btn-ghost tour-skip" onClick={() => onClose()}>
-                {a.tr("tutorial.skip")}
               </button>
             </div>
           </div>

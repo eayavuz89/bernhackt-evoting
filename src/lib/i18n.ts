@@ -25,6 +25,9 @@ const de: Dict = {
   voiceControlOn: "Sprachsteuerung ein",
   voiceControlOff: "Sprachsteuerung aus",
   "tutorial.voiceHint": "Sagen Sie «weiter», «zurück» oder «wiederholen».",
+  "tutorial.autoWelcome":
+    "Willkommen bei StimmZugang, dem barrierefreien E-Voting. Sind Sie blind oder sehbehindert? Dann drücken Sie jetzt die Eingabetaste — das aktiviert Vorlesen und Sprachbedienung. Andernfalls wählen Sie Ihr Profil: Standard, Motorisch eingeschränkt, Einfache Sprache oder Grosse Ansicht. Drücken Sie dazu die Tabulatortaste.",
+  "tutorial.chooseProfile": "Profil wählen",
   "practice.open": "Üben",
   "practice.title": "Übungsmodus",
   "practice.intro": "Dies ist eine Übung. Ihre Stimme zählt nicht — probieren Sie es gefahrlos aus.",
@@ -208,6 +211,9 @@ const en: Dict = {
   voiceControlOn: "Voice control on",
   voiceControlOff: "Voice control off",
   "tutorial.voiceHint": "Say «next», «back» or «repeat».",
+  "tutorial.autoWelcome":
+    "Welcome to StimmZugang, accessible e-voting. Are you blind or visually impaired? Then press Enter now — that turns on read-aloud and voice control. Otherwise choose your profile: Standard, Motor impairment, Easy language or Large view. Press the Tab key to do so.",
+  "tutorial.chooseProfile": "Choose profile",
   "practice.open": "Practice",
   "practice.title": "Practice mode",
   "practice.intro": "This is practice. Your vote does not count — try it safely.",
@@ -371,6 +377,9 @@ const fr: Dict = {
   voiceControlOn: "Commande vocale activée",
   voiceControlOff: "Commande vocale désactivée",
   "tutorial.voiceHint": "Dites « suivant », « retour » ou « répéter ».",
+  "tutorial.autoWelcome":
+    "Bienvenue sur StimmZugang, le vote électronique sans barrières. Êtes-vous aveugle ou malvoyant ? Appuyez alors sur Entrée — cela active la lecture à voix haute et la commande vocale. Sinon, choisissez votre profil : Standard, Handicap moteur, Langage simplifié ou Grand affichage. Appuyez sur la touche Tabulation pour cela.",
+  "tutorial.chooseProfile": "Choisir le profil",
   "tutorial.keyboard": "Clavier : Tab déplace, Entrée choisit, Échap ferme.",
   "tutorial.suggestContrast": "Votre système préfère un contraste élevé.",
   "tutorial.suggestContrastBtn": "Activer le contraste élevé",
@@ -548,6 +557,9 @@ const it: Dict = {
   voiceControlOn: "Comando vocale attivato",
   voiceControlOff: "Comando vocale disattivato",
   "tutorial.voiceHint": "Dica «avanti», «indietro» o «ripeti».",
+  "tutorial.autoWelcome":
+    "Benvenuto su StimmZugang, il voto elettronico senza barriere. È cieco o ipovedente? Allora prema Invio — attiva la lettura ad alta voce e il comando vocale. Altrimenti scelga il suo profilo: Standard, Disabilità motoria, Linguaggio semplice o Visualizzazione grande. Prema il tasto Tab per farlo.",
+  "tutorial.chooseProfile": "Scegli il profilo",
   "tutorial.keyboard": "Tastiera: Tab si sposta, Invio sceglie, Esc chiude.",
   "tutorial.suggestContrast": "Il suo sistema preferisce un contrasto elevato.",
   "tutorial.suggestContrastBtn": "Attiva il contrasto elevato",
@@ -733,6 +745,9 @@ const deLeicht: Dict = {
   doneHelp: "Auf dem Bildschirm steht ein letzter Code. Der Code steht auch auf Ihrem Ausweis.",
   // onboarding tour — simpler wording
   "tutorial.blindMode": "Modus für Blinde",
+  "tutorial.autoWelcome":
+    "Willkommen bei StimmZugang. Sind Sie blind? Dann drücken Sie jetzt die Eingabetaste. Dann liest die App alles vor. Sonst wählen Sie unten Ihr Profil.",
+  "tutorial.chooseProfile": "Profil wählen",
   "tutorial.s1.title": "Willkommen",
   "tutorial.s1.body":
     "Das ist StimmZugang. Hier stimmen Sie ab. Die App liest alles vor. Die App hilft Ihnen Schritt für Schritt.",

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Zwei-Runden-Rückgabecode-Verfahren — StimmZugang</title>
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #191a1d;
+    --ink-soft: #565d6b;
+    --action: #12508c;
+    --action-tint: #eef4fb;
+    --success: #0a6b4b;
+    --success-tint: #ecf8f2;
+    --line: #d7d4ca;
+    --frame: #14181f;
+    --radius: 4px;
+  }
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    font-size: 10.5pt;
+  }
+  h1, h2, h3 { font-family: "Iowan Old Style", Palatino, Georgia, serif; letter-spacing: -0.005em; }
+
+  .doc-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 2px solid var(--frame); padding-bottom: 10px; margin-bottom: 14px;
+  }
+  .brand { font-weight: 700; font-size: 12pt; }
+  .brand small { display:block; color: var(--ink-soft); font-weight:600; font-size: 8.5pt; margin-top:2px; }
+  .eyebrow { color: var(--action); font-weight:700; text-transform:uppercase; letter-spacing:0.12em; font-size: 7.5pt; margin:0 0 4px; }
+  h1 { font-size: 17pt; margin: 0 0 4px; }
+  .subtitle { color: var(--ink-soft); margin: 0 0 12px; font-size: 10pt; }
+  .intro { margin: 0 0 16px; max-width: 62ch; }
+
+  /* legend */
+  .legend { display:flex; gap:18px; flex-wrap:wrap; font-size:8.5pt; color:var(--ink-soft); margin-bottom:12px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .chip { display:inline-block; width:26px; height:0; border-top:2px solid var(--action); position:relative; }
+  .chip.rev { border-top-color: var(--success); }
+  .chip::after { content:""; position:absolute; top:-4px; right:-1px; border:4px solid transparent; border-left-color:var(--action); }
+  .chip.rev::after { right:auto; left:-1px; border-left-color:transparent; border-right-color:var(--success); }
+  .chip.self { border-top:2px dotted var(--ink-soft); }
+  .chip.self::after { display:none; }
+
+  /* sequence diagram */
+  .seq { border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+  .seq-head { display:grid; grid-template-columns:1fr 1fr; }
+  .seq-head div { padding:8px 12px; font-weight:800; font-size:10pt; text-align:center; background:var(--action-tint); color:var(--action); }
+  .seq-head div:first-child { border-right:1px solid var(--line); }
+  .round { background:var(--frame); color:#fff; font-weight:800; font-size:8pt; letter-spacing:0.08em; text-transform:uppercase; padding:5px 12px; }
+  .round span { color:#aeb8c6; font-weight:600; text-transform:none; letter-spacing:0; }
+
+  .step { display:grid; grid-template-columns:26px 1fr; gap:10px; align-items:start; padding:9px 12px; border-top:1px solid var(--line); }
+  .num { width:22px; height:22px; border-radius:var(--radius); background:var(--action); color:#fff;
+         display:flex; align-items:center; justify-content:center; font-weight:800; font-size:9pt; }
+  .step.rev .num { background:var(--success); }
+  .step.self .num { background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+  .msg { font-weight:700; }
+  .flow { font-size:8pt; color:var(--ink-soft); font-weight:700; margin-top:2px; }
+  .flow.to { color:var(--action); }
+  .flow.from { color:var(--success); }
+  .app { font-size:8.5pt; color:var(--ink-soft); margin-top:3px; }
+  .app code { background:var(--action-tint); color:var(--action); padding:1px 5px; border-radius:3px; font-weight:700; }
+
+  .note { border:1px solid var(--line); border-left:3px solid var(--action); background:#faf9f5; border-radius:var(--radius);
+          padding:11px 14px; font-size:9pt; margin-bottom:8px; }
+  .note b { color:var(--action); }
+  .foot { color:var(--ink-soft); font-size:8pt; border-top:1px solid var(--line); padding-top:8px; margin-top:6px; }
+</style>
+</head>
+<body>
+
+  <div class="doc-head">
+    <div>
+      <p class="eyebrow">StimmZugang · Barrierefreies E-Voting</p>
+      <h1>Zwei-Runden-Rückgabecode-Verfahren</h1>
+      <p class="subtitle">Wie die App den Abstimmungsprozess der Schweizerischen Post abbildet</p>
+    </div>
+    <div class="brand">StimmZugang<small>BärnHäckt 2026</small></div>
+  </div>
+
+  <p class="intro">
+    Vor der Wahl erhält jede stimmberechtigte Person einen gedruckten <b>Stimmrechtsausweis</b>.
+    Sie authentisiert sich mit dem <b>Initialisierungscode</b> und einem erweiterten
+    Authentisierungsfaktor (<b>Geburtsjahr</b>) und wählt die gewünschten Optionen. Zur
+    individuellen Verifizierbarkeit läuft die Stimmabgabe in <b>zwei Runden</b> mit auf dem
+    Ausweis gedruckten Rückgabecodes ab. StimmZugang bildet diesen Ablauf vollständig ab —
+    jeder Schritt entspricht einem konkreten App-Screen (in Klammern die React-Route).
+  </p>
+
+  <div class="legend">
+    <span><i class="chip"></i> Wähler:in → System</span>
+    <span><i class="chip rev"></i> System → Wähler:in</span>
+    <span><i class="chip self"></i> Selbstprüfung (mit dem Ausweis)</span>
+  </div>
+
+  <div class="seq">
+    <div class="seq-head"><div>Wähler:in</div><div>System</div></div>
+
+    <div class="round">Runde 1 <span>— Cast-as-intended · Prüfcodes</span></div>
+
+    <div class="step">
+      <span class="num">1</span>
+      <div>
+        <div class="msg">Initialisierungscode + erweiterten Authentisierungsfaktor (Geburtsjahr) eingeben</div>
+        <div class="flow to">▶ Wähler:in → System</div>
+        <div class="app">App: <code>/login</code> · Login.tsx — Initialisierungscode ▲ + Geburtsjahr</div>
+      </div>
+    </div>
+
+    <div class="step self">
+      <span class="num">2</span>
+      <div>
+        <div class="msg">Abstimmungsoptionen auswählen</div>
+        <div class="flow">↻ Aktion auf Seite der Wähler:in</div>
+        <div class="app">App: <code>/ballot</code> · Ballot.tsx — Ja / Nein / Leer einlegen pro Vorlage</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="num">3</span>
+      <div>
+        <div class="msg">Stimme senden (verschlüsseln &amp; übermitteln)</div>
+        <div class="flow to">▶ Wähler:in → System</div>
+        <div class="app">App: Bestätigungsdialog in Ballot.tsx → Navigation zu <code>/verify</code></div>
+      </div>
+    </div>
+
+    <div class="step rev">
+      <span class="num">4</span>
+      <div>
+        <div class="msg">Prüfcodes (Choice Return Codes) senden</div>
+        <div class="flow from">◀ System → Wähler:in</div>
+        <div class="app">App: <code>/verify</code> · Verify.tsx — Prüfcodes ◆ je gewählter Antwort</div>
+      </div>
+    </div>
+
+    <div class="step self">
+      <span class="num">5</span>
+      <div>
+        <div class="msg">Prüfcodes mit dem Stimmrechtsausweis vergleichen</div>
+        <div class="flow">↻ Selbstprüfung — cast-as-intended</div>
+        <div class="app">App: <code>/verify</code> — Vergleich mit den gedruckten Codes (Musterausweis unter <code>/card</code>)</div>
+      </div>
+    </div>
+
+    <div class="round">Runde 2 <span>— Confirmed-as-recorded · Finalisierung</span></div>
+
+    <div class="step">
+      <span class="num">6</span>
+      <div>
+        <div class="msg">Bestätigungscode eingeben</div>
+        <div class="flow to">▶ Wähler:in → System</div>
+        <div class="app">App: <code>/confirm</code> · Confirm.tsx — Bestätigungscode ⬟</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="num">7</span>
+      <div>
+        <div class="msg">Stimme bestätigen</div>
+        <div class="flow to">▶ Wähler:in → System</div>
+        <div class="app">App: <code>/confirm</code> → Navigation zu <code>/done</code></div>
+      </div>
+    </div>
+
+    <div class="step rev">
+      <span class="num">8</span>
+      <div>
+        <div class="msg">Finalisierungscode senden</div>
+        <div class="flow from">◀ System → Wähler:in</div>
+        <div class="app">App: <code>/done</code> · Done.tsx — Finalisierungscode ★</div>
+      </div>
+    </div>
+
+    <div class="step self">
+      <span class="num">9</span>
+      <div>
+        <div class="msg">Finalisierungscode mit dem Stimmrechtsausweis vergleichen</div>
+        <div class="flow">↻ Selbstprüfung — confirmed-as-recorded</div>
+        <div class="app">App: <code>/done</code> — Abschluss, Vergleich mit dem gedruckten Code</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Barrierefrei per Sprache:</b> Die Sprach-Assistentin „Vera" kann denselben Ablauf vollständig
+    per Stimme führen (Werkzeuge <code>set_answer</code> → <code>read_codes</code> → <code>cast_vote</code>
+    über <code>voiceBridge</code>) — für blinde und motorisch eingeschränkte Personen.
+  </div>
+
+  <div class="note" style="border-left-color:var(--ink-soft);">
+    <b style="color:var(--ink-soft)">Prototyp-Hinweis:</b> StimmZugang bildet den vollständigen
+    nutzerseitigen Ablauf (alle neun Schritte) ab. Im Demo ist die <b style="color:var(--ink-soft)">Systemseite</b>
+    clientseitig simuliert und die Codes sind statische Beispielwerte. Ein produktiver kryptografischer
+    Backend — serverseitige Erzeugung der Rückgabecodes, Auszählung, universelle Verifizierbarkeit —
+    ist nicht Teil des Prototyps und wird in diesem Diagramm ebenfalls nicht dargestellt.
+  </div>
+
+  <p class="foot">
+    Quelle: Schweizerische Post — „Swiss Post Voting System, Two rounds return codes scheme".
+    Abbildung erstellt für die technische Jury · StimmZugang, BärnHäckt 2026.
+  </p>
+
+</body>
+</html>
