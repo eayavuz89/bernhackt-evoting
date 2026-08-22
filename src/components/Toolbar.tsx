@@ -44,8 +44,7 @@ export default function Toolbar() {
     <header className="toolbar" role="banner">
       <div className="toolbar-inner">
         <span className="brand">
-          <span className="brand-mark" aria-hidden="true" />
-          {a.tr("appName")}
+          <img className="brand-logo" src="/logo.png" alt={a.tr("appName")} />
         </span>
 
         <div className="a11y-wrap" ref={wrapRef}>

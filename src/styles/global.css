@@ -158,6 +158,18 @@ html[data-contrast="high"] .toolbar {
   color: var(--ink);
   white-space: nowrap;
 }
+.brand-logo {
+  display: block;
+  height: 46px;
+  width: auto;
+}
+/* The wordmark's dark blue would vanish on the black high-contrast header —
+   give the logo a white plate there. */
+html[data-contrast="high"] .brand-logo {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 3px 10px;
+}
 .brand-mark {
   width: 20px;
   height: 20px;
