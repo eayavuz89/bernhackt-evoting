@@ -6,6 +6,10 @@ import type { Answer } from "../lib/data";
 
 const OPTIONS: Answer[] = ["yes", "no", "blank"];
 
+// Pictogram per answer, shown only in Leichte Sprache (cognitive profile) —
+// mirrors the real ballot so practice builds the same recognition.
+const CHOICE_SYM: Record<Answer, string> = { yes: "✓", no: "✗", blank: "☐" };
+
 // Risk-free practice: a mock proposal where choosing Ja/Nein/Leer gives instant
 // earcon + spoken feedback, but nothing is submitted. Lowers the fear of the
 // real vote — the highest-impact comprehension aid (challenge feature #2).
@@ -85,6 +89,11 @@ export default function PracticeMode({ onClose }: { onClose: () => void }) {
                   onChange={() => pick(opt)}
                 />
                 <span className="choice-mark" aria-hidden="true" />
+                {a.easy && (
+                  <span className={"choice-sym sym-" + opt} aria-hidden="true">
+                    {CHOICE_SYM[opt]}
+                  </span>
+                )}
                 <span className="choice-label">{a.tr(opt)}</span>
               </label>
             ))}

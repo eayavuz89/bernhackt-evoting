@@ -105,7 +105,7 @@ export default function App() {
           <Route path="/ballot" element={<Ballot session={session} />} />
           <Route path="/verify" element={<Verify session={session} />} />
           <Route path="/confirm" element={<Confirm session={session} />} />
-          <Route path="/done" element={<Done session={session} />} />
+          <Route path="/done" element={<Done />} />
           <Route path="/card" element={<VotingCard />} />
         </Routes>
       </main>

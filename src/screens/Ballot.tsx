@@ -7,6 +7,11 @@ import type { Session } from "../lib/types";
 
 const OPTIONS: Answer[] = ["yes", "no", "blank"];
 
+// Pictogram per answer, shown only in Leichte Sprache (cognitive profile) as a
+// comprehension aid: ✓ Ja, ✗ Nein, ☐ Leer. Decorative (aria-hidden) — the text
+// label already conveys the choice to screen readers.
+const CHOICE_SYM: Record<Answer, string> = { yes: "✓", no: "✗", blank: "☐" };
+
 export default function Ballot({ session }: { session: Session }) {
   const a = useA11y();
   const nav = useNavigate();
@@ -72,8 +77,15 @@ export default function Ballot({ session }: { session: Session }) {
     <Screen title={a.tr("ballotTitle")} help={a.tr("ballotHelp")} step={2} totalSteps={4}>
       {PROPOSALS.map((p, idx) => {
         const chosen = session.answers[p.id];
+        // After a failed submit, the proposals still missing an answer get the
+        // red border; picking any option clears the error and the highlight.
+        const invalid = !!error && !chosen;
         return (
-          <fieldset className="proposal" key={p.id}>
+          <fieldset
+            className={"proposal" + (invalid ? " invalid" : "")}
+            aria-invalid={invalid || undefined}
+            key={p.id}
+          >
             <legend className="proposal-legend">
               <span className="proposal-num" aria-hidden="true">
                 {idx + 1}
@@ -100,6 +112,11 @@ export default function Ballot({ session }: { session: Session }) {
                       }}
                     />
                     <span className="choice-mark" aria-hidden="true" />
+                    {a.easy && (
+                      <span className={"choice-sym sym-" + opt} aria-hidden="true">
+                        {CHOICE_SYM[opt]}
+                      </span>
+                    )}
                     <span className="choice-label">{a.tr(opt)}</span>
                   </label>
                 );

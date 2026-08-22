@@ -41,6 +41,9 @@ const de: Dict = {
   off: "Aus",
   bigger: "Grösser",
   smaller: "Kleiner",
+  textNormal: "Normale Schrift",
+  textLarge: "Grosse Schrift",
+  textXLarge: "Sehr grosse Schrift",
   // profiles
   "profile.standard": "Standard",
   "profile.blind": "Blind / Sehbehindert",
@@ -51,7 +54,7 @@ const de: Dict = {
   "profile.blind.desc": "Optimiert für Screenreader und Vorlesen.",
   "profile.motor.desc": "Grosse Ziele, Tastatur- und Switch-Bedienung.",
   "profile.cognitive.desc": "Leichte Sprache, Schritt für Schritt, Symbole.",
-  "profile.senior.desc": "Grosse Schrift, hoher Kontrast, wenige Schritte.",
+  "profile.senior.desc": "Grosse Schrift, hoher Kontrast, klare Führung.",
   // steps
   step: "Schritt",
   of: "von",
@@ -72,11 +75,20 @@ const de: Dict = {
   wrongBirthYear: "Das Geburtsjahr ist nicht korrekt.",
   legal1: "Ich gebe meine Stimme elektronisch ab.",
   legal2: "Ich habe die gesetzlichen Bestimmungen zur Kenntnis genommen.",
+  legalInfoAria: "Gesetzliche Bestimmungen anzeigen",
+  legalModalTitle: "Gesetzliche Bestimmungen für die Nutzung des Wahl- und Abstimmungsportals",
+  legalModalNote:
+    "Auszug aus dem Schweizerischen Strafgesetzbuch (StGB; SR 311.0), Art. 279–283. Massgebend ist der vollständige Gesetzestext.",
+  legalModalIntro:
+    "Das Schweizerische Strafgesetzbuch (StGB; SR 311.0) stellt im vierzehnten Titel (Art. 279 bis Art. 283) Vergehen gegen den Volkswillen unter Strafe. Mit Freiheitsstrafe bis zu drei Jahren oder mit Geldstrafe wird insbesondere bestraft,",
+  legalModalItems:
+    "wer einen Stimmberechtigten an der Ausübung des Stimm- oder Wahlrechts durch Gewalt oder Androhung ernstlicher Nachteile hindert oder einen Stimmberechtigten durch Gewalt oder Androhung ernstlicher Nachteile nötigt, das Stimm- oder Wahlrecht überhaupt oder in einem bestimmten Sinn auszuüben (Art. 280 Abs. 1 und Abs. 2);\nwer unbefugt an einer Wahl oder Abstimmung teilnimmt (Art. 282 Ziff. 1 Abs. 2);\nwer das Ergebnis einer Wahl oder einer Abstimmung fälscht, insbesondere durch Hinzufügen, Ändern, Weglassen oder Streichen von Stimmzetteln oder Unterschriften (Art. 282 Ziff. 1 Abs. 3);\nwer Wahl- oder Stimmzettel planmässig einsammelt, ausfüllt oder ändert oder wer derartige Wahl- oder Stimmzettel verteilt (Art. 282bis);\nwer sich durch unrechtmässiges Vorgehen Kenntnis davon verschafft, wie einzelne Berechtigte stimmen oder wählen (Art. 283).",
   mustAcceptLegal: "Bitte bestätigen Sie zuerst beide Erklärungen.",
   scanCard: "QR-Code scannen",
   scanCardHelp: "Oder scannen Sie den QR-Code auf dem Ausweis.",
   login: "Anmelden",
-  demoHint: "Demo: Code ist vorausgefüllt.",
+  autofill: "Ausfüllen",
+  demoHint: "Demo: Feld ist leer – tippen Sie auf „Ausfüllen“.",
   invalidCode: "Der Initialisierungscode ist nicht korrekt. Bitte prüfen Sie die 6 Blöcke.",
   // ballot
   ballotTitle: "Abstimmungsvorlagen",
@@ -114,6 +126,10 @@ const de: Dict = {
   finalizeCode: "Finalisierungscode",
   finishText: "Sie können das Fenster nun schliessen.",
   restart: "Neu starten",
+  alreadyVotedTitle: "Sie haben bereits abgestimmt",
+  alreadyVotedBody:
+    "Ihre Stimme wurde mit dem Finalisierungscode bestätigt. Eine erneute Stimmabgabe ist nicht möglich.",
+  understood: "Verstanden",
   // card
   cardTitle: "Stimmrechtsausweis",
   cardSubtitle: "Muster · Barrierefreies Layout",
@@ -168,6 +184,9 @@ const de: Dict = {
   "tutorial.start": "Anleitung starten",
   "tutorial.skip": "Überspringen",
   "tutorial.repeat": "Vorlesen",
+  "tutorial.audioAll": "Alles vorlesen",
+  "tutorial.audioPlaying": "Wird vorgelesen …",
+  "tutorial.audioStop": "Anhalten",
   "tutorial.finish": "Los geht's",
   "tutorial.s1.title": "Willkommen bei StimmZugang",
   "tutorial.s1.body":
@@ -190,6 +209,23 @@ const de: Dict = {
   "tutorial.keyboard": "Tastatur: Tab bewegt, Enter wählt, Escape schliesst.",
   "tutorial.suggestContrast": "Ihr System bevorzugt hohen Kontrast.",
   "tutorial.suggestContrastBtn": "Hohen Kontrast aktivieren",
+  // process guide — paginated, PDF-style walkthrough of the voting steps (sighted users)
+  "guide.page": "Seite",
+  "guide.s1.title": "1. Anmelden",
+  "guide.s1.body":
+    "Melden Sie sich mit Ihrem Stimmrechtsausweis an: Initialisierungscode eingeben und Geburtsjahr bestätigen.",
+  "guide.s2.title": "2. Vorlagen beantworten",
+  "guide.s2.body":
+    "Lesen Sie jede Abstimmungsvorlage und wählen Sie Ihre Antwort: Ja, Nein oder Leer einlegen.",
+  "guide.s3.title": "3. Verschlüsseln und prüfen",
+  "guide.s3.body":
+    "Ihre Stimme wird verschlüsselt übermittelt. Vergleichen Sie danach die angezeigten Prüfcodes mit den Codes auf Ihrem Stimmrechtsausweis.",
+  "guide.s4.title": "4. Bestätigen",
+  "guide.s4.body":
+    "Stimmen die Codes überein, geben Sie den Bestätigungscode von Ihrem Ausweis ein und geben Sie die Stimme ab.",
+  "guide.s5.title": "5. Fertig",
+  "guide.s5.body":
+    "Ihre Stimme ist abgegeben. Vergleichen Sie zum Schluss den Finalisierungscode mit Ihrem Ausweis.",
 };
 
 const en: Dict = {
@@ -227,6 +263,9 @@ const en: Dict = {
   off: "Off",
   bigger: "Bigger",
   smaller: "Smaller",
+  textNormal: "Normal text",
+  textLarge: "Large text",
+  textXLarge: "Extra-large text",
   "profile.standard": "Standard",
   "profile.blind": "Blind / low vision",
   "profile.motor": "Motor impairment",
@@ -236,7 +275,7 @@ const en: Dict = {
   "profile.blind.desc": "Optimised for screen readers and read-aloud.",
   "profile.motor.desc": "Large targets, keyboard and switch control.",
   "profile.cognitive.desc": "Easy language, step by step, symbols.",
-  "profile.senior.desc": "Large text, high contrast, few steps.",
+  "profile.senior.desc": "Large text, high contrast, clear guidance.",
   step: "Step",
   of: "of",
   next: "Next",
@@ -253,11 +292,20 @@ const en: Dict = {
   wrongBirthYear: "The year of birth is not correct.",
   legal1: "I cast my vote electronically.",
   legal2: "I have taken note of the legal provisions.",
+  legalInfoAria: "Show legal provisions",
+  legalModalTitle: "Legal provisions for using the voting and elections portal",
+  legalModalNote:
+    "Excerpt from the Swiss Criminal Code (SCC; SR 311.0), Art. 279–283. The complete legal text is authoritative.",
+  legalModalIntro:
+    "In its fourteenth title (Art. 279 to Art. 283), the Swiss Criminal Code (SCC; SR 311.0) makes offences against the will of the people punishable. A custodial sentence of up to three years or a monetary penalty applies in particular to:",
+  legalModalItems:
+    "anyone who prevents a person entitled to vote from exercising their right to vote or to elect through violence or the threat of serious harm, or who coerces such a person through violence or the threat of serious harm into exercising the right to vote or to elect at all or in a particular way (Art. 280 para. 1 and 2);\nanyone who takes part in an election or a vote without being entitled to do so (Art. 282 no. 1 para. 2);\nanyone who falsifies the result of an election or a vote, in particular by adding, altering, omitting or deleting ballot papers or signatures (Art. 282 no. 1 para. 3);\nanyone who systematically collects, completes or alters election or ballot papers, or who distributes such papers (Art. 282bis);\nanyone who by unlawful means obtains knowledge of how individual eligible persons vote or elect (Art. 283).",
   mustAcceptLegal: "Please confirm both statements first.",
   scanCard: "Scan QR code",
   scanCardHelp: "Or scan the QR code on the card.",
   login: "Sign in",
-  demoHint: "Demo: the code is pre-filled.",
+  autofill: "Autofill",
+  demoHint: "Demo: field is empty — tap “Autofill”.",
   invalidCode: "The initialisation code is not correct. Please check the 6 blocks.",
   ballotTitle: "Ballot proposals",
   ballotHelp: "Choose one answer per proposal.",
@@ -291,6 +339,10 @@ const en: Dict = {
   finalizeCode: "Finalisation code",
   finishText: "You can now close the window.",
   restart: "Start over",
+  alreadyVotedTitle: "You have already voted",
+  alreadyVotedBody:
+    "Your vote has been confirmed with the finalisation code. Voting again is not possible.",
+  understood: "Understood",
   cardTitle: "Voting card",
   cardSubtitle: "Sample · Barrier-free layout",
   cardName: "Eligible voter",
@@ -343,6 +395,9 @@ const en: Dict = {
   "tutorial.start": "Start tutorial",
   "tutorial.skip": "Skip",
   "tutorial.repeat": "Read aloud",
+  "tutorial.audioAll": "Read all aloud",
+  "tutorial.audioPlaying": "Reading aloud …",
+  "tutorial.audioStop": "Stop",
   "tutorial.finish": "Let's go",
   "tutorial.s1.title": "Welcome to StimmZugang",
   "tutorial.s1.body":
@@ -365,6 +420,23 @@ const en: Dict = {
   "tutorial.keyboard": "Keyboard: Tab moves, Enter selects, Escape closes.",
   "tutorial.suggestContrast": "Your system prefers high contrast.",
   "tutorial.suggestContrastBtn": "Enable high contrast",
+  // process guide — paginated, PDF-style walkthrough of the voting steps (sighted users)
+  "guide.page": "Page",
+  "guide.s1.title": "1. Sign in",
+  "guide.s1.body":
+    "Sign in with your voting card: enter the initialisation code and confirm your year of birth.",
+  "guide.s2.title": "2. Answer the proposals",
+  "guide.s2.body":
+    "Read each ballot proposal and choose your answer: Yes, No or cast blank.",
+  "guide.s3.title": "3. Encrypt and verify",
+  "guide.s3.body":
+    "Your vote is submitted encrypted. Then compare the verification codes shown with the codes on your voting card.",
+  "guide.s4.title": "4. Confirm",
+  "guide.s4.body":
+    "If the codes match, enter the confirmation code from your card and cast your vote.",
+  "guide.s5.title": "5. Done",
+  "guide.s5.body":
+    "Your vote has been cast. Finally, compare the finalisation code with your card.",
 };
 
 const fr: Dict = {
@@ -410,6 +482,9 @@ const fr: Dict = {
   off: "Désactivé",
   bigger: "Plus grand",
   smaller: "Plus petit",
+  textNormal: "Texte normal",
+  textLarge: "Grand texte",
+  textXLarge: "Très grand texte",
   "profile.standard": "Standard",
   "profile.blind": "Aveugle / malvoyant",
   "profile.motor": "Handicap moteur",
@@ -419,7 +494,7 @@ const fr: Dict = {
   "profile.blind.desc": "Optimisé pour les lecteurs d'écran et la lecture à voix haute.",
   "profile.motor.desc": "Grandes cibles, commande au clavier et par contacteur.",
   "profile.cognitive.desc": "Langage simplifié, étape par étape, symboles.",
-  "profile.senior.desc": "Grande police, contraste élevé, peu d'étapes.",
+  "profile.senior.desc": "Grande police, contraste élevé, guidage clair.",
   step: "Étape",
   of: "sur",
   next: "Suivant",
@@ -438,11 +513,20 @@ const fr: Dict = {
   wrongBirthYear: "L'année de naissance n'est pas correcte.",
   legal1: "Je vote par voie électronique.",
   legal2: "J'ai pris connaissance des dispositions légales.",
+  legalInfoAria: "Afficher les dispositions légales",
+  legalModalTitle: "Dispositions légales relatives à l'utilisation du portail de vote et d'élection",
+  legalModalNote:
+    "Extrait du Code pénal suisse (CP ; RS 311.0), art. 279 à 283. Seul le texte légal complet fait foi.",
+  legalModalIntro:
+    "Dans son quatorzième titre (art. 279 à art. 283), le Code pénal suisse (CP ; RS 311.0) réprime les crimes ou délits contre la volonté populaire. Est notamment puni d'une peine privative de liberté de trois ans au plus ou d'une peine pécuniaire :",
+  legalModalItems:
+    "quiconque, par violence ou menace d'un dommage sérieux, empêche un électeur d'exercer son droit de vote ou d'élection, ou le contraint à exercer ce droit ou à l'exercer dans un sens déterminé (art. 280 al. 1 et 2) ;\nquiconque prend part sans droit à une élection ou à une votation (art. 282 ch. 1 al. 2) ;\nquiconque falsifie le résultat d'une élection ou d'une votation, notamment en ajoutant, modifiant, omettant ou supprimant des bulletins de vote ou des signatures (art. 282 ch. 1 al. 3) ;\nquiconque recueille, remplit ou modifie de manière systématique des bulletins électoraux ou de vote, ou distribue de tels bulletins (art. 282bis) ;\nquiconque, par un procédé illicite, prend connaissance de la manière dont des personnes déterminées votent ou élisent (art. 283).",
   mustAcceptLegal: "Veuillez d'abord confirmer les deux déclarations.",
   scanCard: "Scanner le code QR",
   scanCardHelp: "Ou scannez le code QR figurant sur la carte.",
   login: "Se connecter",
-  demoHint: "Démo : le code est prérempli.",
+  autofill: "Remplir",
+  demoHint: "Démo : le champ est vide — appuyez sur « Remplir ».",
   invalidCode: "Le code d'initialisation n'est pas correct. Veuillez vérifier les 6 blocs.",
   ballotTitle: "Objets soumis au vote",
   ballotHelp: "Choisissez une réponse par objet.",
@@ -476,6 +560,10 @@ const fr: Dict = {
   finalizeCode: "Code de finalisation",
   finishText: "Vous pouvez maintenant fermer la fenêtre.",
   restart: "Recommencer",
+  alreadyVotedTitle: "Vous avez déjà voté",
+  alreadyVotedBody:
+    "Votre vote a été confirmé par le code de finalisation. Il n'est plus possible de voter à nouveau.",
+  understood: "Compris",
   cardTitle: "Carte de vote",
   cardSubtitle: "Modèle · Mise en page sans barrières",
   cardName: "Personne ayant le droit de vote",
@@ -529,6 +617,9 @@ const fr: Dict = {
   "tutorial.start": "Démarrer le guide",
   "tutorial.skip": "Passer",
   "tutorial.repeat": "Lire à voix haute",
+  "tutorial.audioAll": "Tout lire à voix haute",
+  "tutorial.audioPlaying": "Lecture en cours …",
+  "tutorial.audioStop": "Arrêter",
   "tutorial.finish": "C'est parti",
   "tutorial.s1.title": "Bienvenue sur StimmZugang",
   "tutorial.s1.body":
@@ -545,6 +636,23 @@ const fr: Dict = {
   "tutorial.s5.title": "Assistant vocal et aide",
   "tutorial.s5.body":
     "En bas à droite, l'assistant vocal vous aide par la voix. Vous pouvez rouvrir ce guide à tout moment depuis le menu « Accessibilité ».",
+  // process guide — paginated, PDF-style walkthrough of the voting steps (sighted users)
+  "guide.page": "Page",
+  "guide.s1.title": "1. Se connecter",
+  "guide.s1.body":
+    "Connectez-vous avec votre carte de vote : saisissez le code d'initialisation et confirmez votre année de naissance.",
+  "guide.s2.title": "2. Répondre aux objets",
+  "guide.s2.body":
+    "Lisez chaque objet soumis au vote et choisissez votre réponse : Oui, Non ou voter blanc.",
+  "guide.s3.title": "3. Chiffrer et vérifier",
+  "guide.s3.body":
+    "Votre vote est transmis chiffré. Comparez ensuite les codes de vérification affichés avec ceux de votre carte de vote.",
+  "guide.s4.title": "4. Confirmer",
+  "guide.s4.body":
+    "Si les codes correspondent, saisissez le code de confirmation de votre carte et exprimez votre vote.",
+  "guide.s5.title": "5. Terminé",
+  "guide.s5.body":
+    "Votre vote est enregistré. Pour finir, comparez le code de finalisation avec votre carte.",
 };
 
 const it: Dict = {
@@ -590,6 +698,9 @@ const it: Dict = {
   off: "Disattivato",
   bigger: "Più grande",
   smaller: "Più piccolo",
+  textNormal: "Testo normale",
+  textLarge: "Testo grande",
+  textXLarge: "Testo molto grande",
   "profile.standard": "Standard",
   "profile.blind": "Cieco / ipovedente",
   "profile.motor": "Disabilità motoria",
@@ -599,7 +710,7 @@ const it: Dict = {
   "profile.blind.desc": "Ottimizzato per screen reader e lettura ad alta voce.",
   "profile.motor.desc": "Bersagli grandi, comando da tastiera e con sensore.",
   "profile.cognitive.desc": "Linguaggio semplice, passo dopo passo, simboli.",
-  "profile.senior.desc": "Caratteri grandi, contrasto elevato, pochi passaggi.",
+  "profile.senior.desc": "Caratteri grandi, contrasto elevato, guida chiara.",
   step: "Passaggio",
   of: "di",
   next: "Avanti",
@@ -619,11 +730,20 @@ const it: Dict = {
   wrongBirthYear: "L'anno di nascita non è corretto.",
   legal1: "Esprimo il mio voto per via elettronica.",
   legal2: "Ho preso atto delle disposizioni legali.",
+  legalInfoAria: "Mostra le disposizioni legali",
+  legalModalTitle: "Disposizioni legali per l'utilizzo del portale di voto ed elezione",
+  legalModalNote:
+    "Estratto del Codice penale svizzero (CP; RS 311.0), art. 279–283. Fa fede il testo di legge completo.",
+  legalModalIntro:
+    "Nel suo quattordicesimo titolo (art. 279 a art. 283), il Codice penale svizzero (CP; RS 311.0) punisce i reati contro la volontà popolare. È punito in particolare con una pena detentiva sino a tre anni o con una pena pecuniaria:",
+  legalModalItems:
+    "chiunque, con violenza o minaccia di grave danno, impedisce a un avente diritto di esercitare il diritto di voto o di elezione, oppure lo costringe a esercitarlo o a esercitarlo in un determinato senso (art. 280 cpv. 1 e 2);\nchiunque prende parte senza diritto a un'elezione o a una votazione (art. 282 n. 1 cpv. 2);\nchiunque falsifica il risultato di un'elezione o di una votazione, in particolare aggiungendo, modificando, omettendo o eliminando schede o firme (art. 282 n. 1 cpv. 3);\nchiunque raccoglie, riempie o modifica sistematicamente schede elettorali o di voto, oppure distribuisce tali schede (art. 282bis);\nchiunque, con un procedimento illecito, viene a conoscenza del modo in cui singoli aventi diritto votano o eleggono (art. 283).",
   mustAcceptLegal: "Confermi innanzitutto entrambe le dichiarazioni.",
   scanCard: "Scansiona il codice QR",
   scanCardHelp: "Oppure scansioni il codice QR sulla carta.",
   login: "Accedi",
-  demoHint: "Demo: il codice è precompilato.",
+  autofill: "Compila",
+  demoHint: "Demo: il campo è vuoto — tocchi “Compila”.",
   invalidCode: "Il codice di inizializzazione non è corretto. Verifichi i 6 blocchi.",
   ballotTitle: "Oggetti in votazione",
   ballotHelp: "Scelga una risposta per ogni oggetto.",
@@ -657,6 +777,10 @@ const it: Dict = {
   finalizeCode: "Codice di finalizzazione",
   finishText: "Ora può chiudere la finestra.",
   restart: "Ricomincia",
+  alreadyVotedTitle: "Ha già votato",
+  alreadyVotedBody:
+    "Il suo voto è stato confermato con il codice di finalizzazione. Non è più possibile votare di nuovo.",
+  understood: "Ho capito",
   cardTitle: "Carta di voto",
   cardSubtitle: "Modello · Layout senza barriere",
   cardName: "Persona avente diritto di voto",
@@ -710,6 +834,9 @@ const it: Dict = {
   "tutorial.start": "Avvia la guida",
   "tutorial.skip": "Salta",
   "tutorial.repeat": "Leggi ad alta voce",
+  "tutorial.audioAll": "Leggi tutto ad alta voce",
+  "tutorial.audioPlaying": "Lettura in corso …",
+  "tutorial.audioStop": "Ferma",
   "tutorial.finish": "Iniziamo",
   "tutorial.s1.title": "Benvenuto su StimmZugang",
   "tutorial.s1.body":
@@ -726,6 +853,23 @@ const it: Dict = {
   "tutorial.s5.title": "Assistente vocale e aiuto",
   "tutorial.s5.body":
     "In basso a destra, l'assistente vocale la aiuta con la voce. Può riaprire questa guida in qualsiasi momento dal menu «Accessibilità».",
+  // process guide — paginated, PDF-style walkthrough of the voting steps (sighted users)
+  "guide.page": "Pagina",
+  "guide.s1.title": "1. Accedere",
+  "guide.s1.body":
+    "Acceda con la sua carta di voto: inserisca il codice di inizializzazione e confermi l'anno di nascita.",
+  "guide.s2.title": "2. Rispondere agli oggetti",
+  "guide.s2.body":
+    "Legga ogni oggetto in votazione e scelga la sua risposta: Sì, No o scheda bianca.",
+  "guide.s3.title": "3. Cifrare e verificare",
+  "guide.s3.body":
+    "Il suo voto viene trasmesso cifrato. Poi confronti i codici di verifica visualizzati con quelli sulla sua carta di voto.",
+  "guide.s4.title": "4. Confermare",
+  "guide.s4.body":
+    "Se i codici corrispondono, inserisca il codice di conferma della sua carta ed esprima il voto.",
+  "guide.s5.title": "5. Fatto",
+  "guide.s5.body":
+    "Il suo voto è stato registrato. Per concludere, confronti il codice di finalizzazione con la sua carta.",
 };
 
 // Leichte Sprache (easy German) overlay — only the keys that benefit from simpler wording.
@@ -766,6 +910,22 @@ const deLeicht: Dict = {
   "tutorial.s6.title": "Ist das sicher?",
   "tutorial.s6.body":
     "Ja. Ihre Stimme ist geheim. Ihre Stimme wird verschlüsselt. Danach prüfen Sie Codes. So wissen Sie: Alles ist richtig.",
+  // process guide — simpler wording
+  "guide.s1.title": "1. Anmelden",
+  "guide.s1.body":
+    "Auf dem Ausweis steht ein Code beim Dreieck ▲. Tippen Sie den Code ein. Tippen Sie auch Ihr Geburtsjahr ein.",
+  "guide.s2.title": "2. Fragen beantworten",
+  "guide.s2.body":
+    "Sie sehen Fragen. Wählen Sie bei jeder Frage: Ja, Nein oder Leer.",
+  "guide.s3.title": "3. Codes vergleichen",
+  "guide.s3.body":
+    "Auf dem Bildschirm stehen Prüf-Codes. Die gleichen Codes stehen auf Ihrem Ausweis. Sind sie gleich? Dann ist alles gut.",
+  "guide.s4.title": "4. Bestätigen",
+  "guide.s4.body":
+    "Auf Ihrem Ausweis steht noch ein Code. Tippen Sie diesen Code ein. Dann geht Ihre Stimme ab.",
+  "guide.s5.title": "5. Fertig",
+  "guide.s5.body":
+    "Danke. Ihre Stimme ist abgegeben. Ein letzter Code steht auf dem Bildschirm und auf Ihrem Ausweis.",
 };
 
 const dicts: Record<Lang, Dict> = { de, fr, it, en };

@@ -25,7 +25,9 @@ interface A11yState {
   setVoiceControl: (b: boolean) => void;
   setOnboardingSeen: (b: boolean) => void;
   tr: (key: string) => string;
-  speak: (text: string) => void;
+  // onEnd (when given) fires exactly once, on natural end OR error — lets callers
+  // chain utterances (e.g. the tutorial's "read everything aloud" mode).
+  speak: (text: string, onEnd?: () => void) => void;
   stopSpeak: () => void;
 }
 
@@ -37,7 +39,7 @@ const PROFILE_DEFAULTS: Record<Profile, Partial<A11yState>> = {
   blind: { fontScale: 1.15, contrast: "high", easy: false, readAloud: true, soundCues: true, voiceControl: true },
   motor: { fontScale: 1.25, contrast: "normal", easy: false, readAloud: false, soundCues: true, voiceControl: false },
   cognitive: { fontScale: 1.2, contrast: "normal", easy: true, readAloud: true, soundCues: true, voiceControl: false },
-  senior: { fontScale: 1.4, contrast: "high", easy: false, readAloud: false, soundCues: false, voiceControl: false },
+  senior: { fontScale: 1.3, contrast: "high", easy: false, readAloud: false, soundCues: false, voiceControl: false },
 };
 
 const LANG_VOICE: Record<Lang, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-GB" };
@@ -136,12 +138,25 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   }, []);
 
   const speak = useCallback(
-    (text: string) => {
-      if (!("speechSynthesis" in window)) return;
+    (text: string, onEnd?: () => void) => {
+      if (!("speechSynthesis" in window)) {
+        onEnd?.(); // no TTS: still let a chain advance rather than stall
+        return;
+      }
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = LANG_VOICE[lang];
       u.rate = 0.95;
+      if (onEnd) {
+        let done = false;
+        const fire = () => {
+          if (done) return;
+          done = true;
+          onEnd();
+        };
+        u.onend = fire;
+        u.onerror = fire;
+      }
       window.speechSynthesis.speak(u);
     },
     [lang]

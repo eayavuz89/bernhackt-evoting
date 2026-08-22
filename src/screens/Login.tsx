@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
@@ -12,60 +12,146 @@ export default function Login() {
   const a = useA11y();
   const nav = useNavigate();
   const [sp] = useSearchParams();
-  // Pre-filled for the demo so judges can proceed instantly; the card's QR
-  // deep-links here with ?init=<code> (one-tap sign-in for motor-impaired users).
-  const [code, setCode] = useState(sp.get("init") || CARD.initCode);
+  // Empty by default; the "Ausfüllen" button next to the field fills the demo
+  // code on demand. The card's QR still deep-links here with ?init=<code>
+  // (one-tap sign-in for motor-impaired users), which pre-fills the field.
+  const [code, setCode] = useState(sp.get("init") || "");
   const [year, setYear] = useState(CARD.birthYear);
   const [legal1, setLegal1] = useState(false);
   const [legal2, setLegal2] = useState(false);
   const [error, setError] = useState("");
+  // Which field the current warning refers to, so only that field's border
+  // turns red — not every input on the screen.
+  const [errorField, setErrorField] = useState<"" | "legal" | "code" | "year">("");
+  // Legal-provisions reader dialog, opened from the info icon in the second
+  // acknowledgement row.
+  const [legalOpen, setLegalOpen] = useState(false);
+  const legalInfoBtnRef = useRef<HTMLButtonElement | null>(null);
+  const legalCloseRef = useRef<HTMLButtonElement | null>(null);
+
+  // While open: pull focus into the dialog, close on Escape, and return focus to
+  // the info icon on close (keyboard + screen-reader users).
+  useEffect(() => {
+    if (!legalOpen) return;
+    legalCloseRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLegal();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [legalOpen]);
+
+  function closeLegal() {
+    setLegalOpen(false);
+    legalInfoBtnRef.current?.focus();
+  }
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!legal1 || !legal2) {
       setError(a.tr("mustAcceptLegal"));
+      setErrorField("legal");
       return;
     }
     if (norm(code) !== norm(CARD.initCode)) {
       setError(a.tr("invalidCode"));
+      setErrorField("code");
       return;
     }
     if (year.trim() !== CARD.birthYear) {
       setError(a.tr("wrongBirthYear"));
+      setErrorField("year");
       return;
     }
     setError("");
+    setErrorField("");
     nav("/ballot");
   };
 
   return (
     <Screen title={a.tr("loginTitle")} help={a.tr("loginHelp")} step={1} totalSteps={4}>
       <form className="form" onSubmit={submit} noValidate>
-        {/* Legal acknowledgement (official step 1: Gesetzliche Bestimmungen) */}
-        <label className="confirm-check legal-check">
-          <input type="checkbox" checked={legal1} onChange={(e) => setLegal1(e.target.checked)} />
+        {/* Legal acknowledgement (official step 1: Gesetzliche Bestimmungen).
+            When the "confirm both" warning fires, only the boxes still unchecked
+            turn red. */}
+        <label
+          className={"confirm-check legal-check" + (errorField === "legal" && !legal1 ? " invalid" : "")}
+        >
+          <input
+            type="checkbox"
+            checked={legal1}
+            onChange={(e) => setLegal1(e.target.checked)}
+            aria-invalid={errorField === "legal" && !legal1}
+            aria-describedby="cardError"
+          />
           <span>{a.tr("legal1")}</span>
         </label>
-        <label className="confirm-check legal-check">
-          <input type="checkbox" checked={legal2} onChange={(e) => setLegal2(e.target.checked)} />
+        <label
+          className={"confirm-check legal-check" + (errorField === "legal" && !legal2 ? " invalid" : "")}
+        >
+          <input
+            type="checkbox"
+            checked={legal2}
+            onChange={(e) => setLegal2(e.target.checked)}
+            aria-invalid={errorField === "legal" && !legal2}
+            aria-describedby="cardError"
+          />
           <span>{a.tr("legal2")}</span>
+          {/* Read the provisions before acknowledging. A button nested in a label
+              does not toggle the checkbox (interactive-descendant rule). */}
+          <button
+            type="button"
+            className="legal-info-btn"
+            ref={legalInfoBtnRef}
+            aria-haspopup="dialog"
+            aria-label={a.tr("legalInfoAria")}
+            onClick={(e) => {
+              e.stopPropagation();
+              setLegalOpen(true);
+            }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="11" x2="12" y2="16" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </button>
         </label>
 
         <div className="field">
           <label htmlFor="cardCode">
             <span className="sym" aria-hidden="true">▲</span> {a.tr("cardCode")}
           </label>
-          <input
-            id="cardCode"
-            className="input input-code"
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            aria-describedby="cardCodeHint cardError"
-            aria-invalid={!!error}
-          />
+          <div className="input-with-action">
+            <input
+              id="cardCode"
+              className="input input-code"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              aria-describedby="cardCodeHint cardError"
+              aria-invalid={errorField === "code"}
+            />
+            <button
+              type="button"
+              className="btn-autofill"
+              onClick={() => setCode(CARD.initCode)}
+              aria-controls="cardCode"
+            >
+              <span className="sym" aria-hidden="true">✎</span> {a.tr("autofill")}
+            </button>
+          </div>
           <p id="cardCodeHint" className="hint">
             {a.tr("cardCodeHint")} <span className="demo-hint">{a.tr("demoHint")}</span>
           </p>
@@ -81,7 +167,7 @@ export default function Login() {
             value={year}
             onChange={(e) => setYear(e.target.value)}
             aria-describedby="birthYearHint cardError"
-            aria-invalid={!!error}
+            aria-invalid={errorField === "year"}
           />
           <p id="birthYearHint" className="hint">
             {a.tr("birthYearHint")}
@@ -105,6 +191,41 @@ export default function Login() {
 
         <p className="scan-note">📷 {a.tr("scanCardHelp")}</p>
       </form>
+
+      {legalOpen && (
+        <div className="dialog-backdrop" role="presentation" onClick={closeLegal}>
+          <div
+            className="dialog dialog-legal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="legalTitle"
+            aria-describedby="legalNote"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="legalTitle" className="dialog-title">
+              {a.tr("legalModalTitle")}
+            </h2>
+            <p id="legalNote" className="dialog-note">
+              {a.tr("legalModalNote")}
+            </p>
+            <div className="dialog-body legal-body">
+              <p className="legal-intro">{a.tr("legalModalIntro")}</p>
+              <ul className="legal-list">
+                {a.tr("legalModalItems")
+                  .split("\n")
+                  .map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+              </ul>
+            </div>
+            <div className="dialog-actions">
+              <button ref={legalCloseRef} type="button" className="btn btn-primary" onClick={closeLegal}>
+                {a.tr("close")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Screen>
   );
 }

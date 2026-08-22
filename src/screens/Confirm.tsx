@@ -9,7 +9,8 @@ const EXPECTED = CARD.confirmCode.replace(/\s/g, ""); // "649130"
 export default function Confirm({ session }: { session: { answers: Record<string, string> } }) {
   const a = useA11y();
   const nav = useNavigate();
-  const [code, setCode] = useState(CARD.confirmCode);
+  // Empty by default; the "Ausfüllen" button fills the demo code on demand.
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
   const submit = (e: React.FormEvent) => {
@@ -29,16 +30,26 @@ export default function Confirm({ session }: { session: { answers: Record<string
           <label htmlFor="confirmCode">
             <span className="sym" aria-hidden="true">⬟</span> {a.tr("confirmCode")}
           </label>
-          <input
-            id="confirmCode"
-            className="input input-code"
-            inputMode="numeric"
-            autoComplete="off"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            aria-describedby="confirmHint confirmError"
-            aria-invalid={!!error}
-          />
+          <div className="input-with-action">
+            <input
+              id="confirmCode"
+              className="input input-code"
+              inputMode="numeric"
+              autoComplete="off"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              aria-describedby="confirmHint confirmError"
+              aria-invalid={!!error}
+            />
+            <button
+              type="button"
+              className="btn-autofill"
+              onClick={() => setCode(CARD.confirmCode)}
+              aria-controls="confirmCode"
+            >
+              <span className="sym" aria-hidden="true">✎</span> {a.tr("autofill")}
+            </button>
+          </div>
           <p id="confirmHint" className="hint">
             {a.tr("confirmCodeHint")} <span className="demo-hint">{a.tr("demoHint")}</span>
           </p>

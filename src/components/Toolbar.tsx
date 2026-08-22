@@ -5,6 +5,25 @@ import Dropdown from "./Dropdown";
 
 const PROFILES: Profile[] = ["standard", "blind", "motor", "cognitive", "senior"];
 
+// Text size is a 3-step control (not an open-ended A−/A+ stepper). The top step
+// is deliberately capped at 1.3 so enlarging the text can never grow so much
+// that primary actions get pushed off a non-scrolling layout — the issue a
+// tester hit when the old stepper allowed up to 2.0×. The rising "A" glyph size
+// signals each step visually. Values mirror the profile presets' ceiling.
+const TEXT_STEPS = [
+  { scale: 1.0, labelKey: "textNormal", glyph: "1rem" },
+  { scale: 1.15, labelKey: "textLarge", glyph: "1.25rem" },
+  { scale: 1.3, labelKey: "textXLarge", glyph: "1.55rem" },
+] as const;
+
+// Highlight the step nearest the active font scale, so a profile whose preset
+// sits between steps (e.g. motor 1.25) still shows one step as selected.
+const nearestTextScale = (fs: number) =>
+  TEXT_STEPS.reduce(
+    (best, s) => (Math.abs(s.scale - fs) < Math.abs(best - fs) ? s.scale : best),
+    TEXT_STEPS[0].scale
+  );
+
 // Clean header (brand + one labelled trigger) that opens the accessibility
 // controls as a disclosure menu. Semantics: a button with aria-expanded/-controls
 // toggling a role="group" panel (NOT role="menu" — the panel holds form controls,
@@ -109,24 +128,23 @@ export default function Toolbar({ onOpenTutorial }: { onOpenTutorial: () => void
             </div>
 
             <div className="ctl">
-              <span className="ctl-label">{a.tr("textSize")}</span>
-              <div className="btn-row">
-                <button
-                  type="button"
-                  className="icon-btn"
-                  onClick={() => a.setFontScale(Math.max(0.9, +(a.fontScale - 0.1).toFixed(2)))}
-                  aria-label={a.tr("smaller")}
-                >
-                  A−
-                </button>
-                <button
-                  type="button"
-                  className="icon-btn"
-                  onClick={() => a.setFontScale(Math.min(2.0, +(a.fontScale + 0.1).toFixed(2)))}
-                  aria-label={a.tr("bigger")}
-                >
-                  A+
-                </button>
+              <span className="ctl-label" id="ctl-textsize">{a.tr("textSize")}</span>
+              <div className="text-size-steps" role="group" aria-labelledby="ctl-textsize">
+                {TEXT_STEPS.map((step) => {
+                  const active = nearestTextScale(a.fontScale) === step.scale;
+                  return (
+                    <button
+                      key={step.scale}
+                      type="button"
+                      className={"text-size-step" + (active ? " is-active" : "")}
+                      aria-pressed={active}
+                      aria-label={a.tr(step.labelKey)}
+                      onClick={() => a.setFontScale(step.scale)}
+                    >
+                      <span aria-hidden="true" style={{ fontSize: step.glyph }}>A</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

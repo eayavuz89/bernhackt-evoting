@@ -460,6 +460,36 @@ html[data-contrast="high"] .dd-option[aria-selected="true"] {
 .toggle:hover {
   border-color: var(--action);
 }
+/* Text size: a 3-step segmented control. Each step is an equal-width target with
+   a rising "A" glyph; the active step fills like a pressed .toggle. */
+.text-size-steps {
+  display: flex;
+  gap: 6px;
+}
+.text-size-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  font-weight: 800;
+  font-family: inherit;
+  line-height: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.text-size-step:hover {
+  border-color: var(--action);
+}
+.text-size-step.is-active {
+  background: var(--action);
+  color: var(--action-ink);
+  border-color: var(--action);
+}
 
 /* ---------------- Main / screen ---------------- */
 /* Home only: a very faint Swiss-landscape wash behind everything. Purely
@@ -487,7 +517,10 @@ html[data-contrast="high"] .home-bg {
   }
 }
 .main {
-  max-width: var(--maxw);
+  /* min(..., 100%) caps the content column at the viewport so a long word or a
+     nowrap control can never grow the flex item past the screen (horizontal
+     scroll / "buttons lose their layout" at large text sizes). */
+  max-width: min(var(--maxw), 100%);
   margin: 0 auto;
   padding: clamp(28px, 4vw, 44px) clamp(16px, 4vw, 20px) 96px;
 }
@@ -538,6 +571,10 @@ html[data-contrast="high"] .eyebrow {
   letter-spacing: -0.02em;
   font-weight: 700;
   margin: 0 0 10px;
+  /* Long German compounds (e.g. "Abstimmungsvorlagen") must break rather than
+     force horizontal overflow at large text sizes — anywhere keeps min-content
+     from widening the page. */
+  overflow-wrap: anywhere;
 }
 .screen-title:focus {
   outline: none;
@@ -743,6 +780,12 @@ html[data-contrast="high"] .btn-cast {
   max-width: 340px;
   justify-content: center;
   text-align: center;
+  /* Pin to a fixed size exactly like .profile-card above: on the picker the CTAs
+     must stay the SAME size as the cards no matter which profile's --font-scale
+     is active, so selecting Blind / Grosse Ansicht doesn't balloon the buttons
+     (text and height) past the cards. btn-lg is 1.18rem; dividing by --font-scale
+     cancels the global scale so the whole picker stays one consistent size. */
+  font-size: calc(1.18rem / var(--font-scale));
 }
 @media (max-width: 480px) {
   .actions-cta .btn {
@@ -867,6 +910,25 @@ html[data-contrast="high"] .profile-icon {
   font-size: 0.95em;
   line-height: 1.5;
 }
+/* Single column (phone): there is no neighbouring card to align descriptions
+   against, so the foot-anchoring above (margin-top:auto + tall min-height) just
+   leaves a big void between title and description. Centre the title+description
+   as one balanced block — title a little lower, description a little higher —
+   and follow the icon down so it stays beside the title. Placed AFTER the base
+   .profile-* rules so these overrides win on source order. */
+@media (max-width: 480px) {
+  .profile-card {
+    min-height: 8.25em;
+    justify-content: center;
+  }
+  .profile-desc {
+    margin-top: 0;
+  }
+  .profile-icon {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
 
 /* ---------------- Forms ---------------- */
 .form {
@@ -904,6 +966,16 @@ html[data-contrast="high"] .profile-icon {
   border-color: var(--action);
   outline-offset: 1px;
 }
+/* Validation error: red border on the specific field a ⚠️ warning refers to.
+   Inset ring reads as a crisp 2px edge with no layout shift. */
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+.input[aria-invalid="true"]:focus {
+  border-color: var(--danger);
+  outline-color: var(--danger);
+}
 .hint {
   font-size: 0.92rem;
   color: var(--ink-soft);
@@ -912,6 +984,57 @@ html[data-contrast="high"] .profile-icon {
 .demo-hint {
   color: var(--action);
   font-weight: 700;
+}
+/* Code field + inline "Ausfüllen" (autofill) button */
+.input-with-action {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.input-with-action .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.btn-autofill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 58px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--action);
+  background: var(--action-tint);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.btn-autofill:hover {
+  background: var(--action);
+  color: var(--action-ink);
+  border-color: var(--action);
+}
+.btn-autofill:active {
+  transform: translateY(1px);
+}
+.btn-autofill .sym {
+  font-size: 1.05em;
+}
+html[data-profile="motor"] .btn-autofill {
+  min-height: 64px;
+}
+@media (max-width: 460px) {
+  .input-with-action {
+    flex-wrap: wrap;
+  }
+  .btn-autofill {
+    flex: 1 1 100%;
+  }
 }
 .scan-note {
   margin-top: 20px;
@@ -933,6 +1056,11 @@ html[data-contrast="high"] .profile-icon {
   padding: 22px;
   margin: 0 0 16px;
   min-width: 0; /* stop the fieldset's min-content width from overflowing */
+}
+/* Proposal still missing an answer after "please answer all" fires */
+.proposal.invalid {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
 }
 /* Float the <legend> into normal flow so it sits INSIDE the card instead of
    straddling (and breaking) the top border — the default fieldset/legend look. */
@@ -1032,6 +1160,25 @@ html[data-contrast="high"] .choice.chosen .choice-mark::after {
   font-size: 1.2rem;
   font-weight: 700;
 }
+/* Answer pictograms (Leichte Sprache / cognitive profile only): a fixed-width,
+   colour-coded glyph before the label — ✓ green, ✗ red, ☐ neutral. */
+.choice-sym {
+  flex: none;
+  width: 1.5em;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.choice-sym.sym-yes {
+  color: var(--success);
+}
+.choice-sym.sym-no {
+  color: var(--danger);
+}
+.choice-sym.sym-blank {
+  color: var(--ink-soft);
+}
 
 /* ---------------- Verify ---------------- */
 .verify-list {
@@ -1114,6 +1261,11 @@ html[data-contrast="high"] .code-badge {
   height: 30px;
   flex: none;
   accent-color: var(--success);
+}
+/* Unconfirmed declaration after a failed submit */
+.confirm-check.invalid {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
 }
 
 /* ---------------- Done ---------------- */
@@ -1628,6 +1780,89 @@ html[data-contrast="high"] .dialog-body {
   justify-content: flex-end;
 }
 
+/* Legal-provisions reader dialog (info icon by the "gesetzliche Bestimmungen"
+   acknowledgement). Long representative demo text scrolls within the dialog. */
+.dialog-legal {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+.dialog-note {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  background: color-mix(in srgb, var(--action) 8%, var(--surface));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin: 0 0 16px;
+}
+html[data-contrast="high"] .dialog-note {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.legal-body {
+  color: var(--ink);
+  line-height: 1.65;
+  font-size: 1rem;
+}
+.legal-intro {
+  margin: 0 0 14px;
+}
+/* Numbered offence clauses (StGB Art. 279–283). Markers sit in the gutter so the
+   article references stay readable at large text sizes. */
+.legal-list {
+  margin: 0;
+  padding-left: 1.4em;
+  list-style: decimal;
+}
+.legal-list li {
+  margin: 0 0 12px;
+  padding-left: 4px;
+}
+.legal-list li:last-child {
+  margin-bottom: 0;
+}
+/* Inline info trigger in the acknowledgement row: sharp, civic, no shadow —
+   hover fills instead. Sized for motor-impaired tap targets (scales with font). */
+.legal-info-btn {
+  margin-left: auto;
+  flex: none;
+  /* Inherit the row's font so the em-sized target scales with the profile, and
+     never fall below the 44px minimum tap target (motor-impaired users). */
+  font: inherit;
+  display: inline-grid;
+  place-items: center;
+  width: 2.75em;
+  height: 2.75em;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--action);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.legal-info-btn svg {
+  width: 1.3em;
+  height: 1.3em;
+}
+.legal-info-btn:hover,
+.legal-info-btn:focus-visible {
+  background: var(--action);
+  color: var(--action-ink);
+  border-color: var(--action);
+}
+html[data-contrast="high"] .legal-info-btn {
+  border-width: 2px;
+  border-color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .legal-info-btn {
+    transition: none;
+  }
+}
+
 /* ---- Practice mode dialog ---- */
 .dialog.practice {
   max-width: 520px;
@@ -1692,7 +1927,7 @@ html[data-contrast="high"] .dialog-body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 16px 0 0;
+  margin: 16px 0 20px;
   padding: 12px 14px;
   background: var(--success-tint);
   border-radius: var(--radius);
@@ -1859,6 +2094,95 @@ html[data-contrast="high"] .tour-kbd {
   color: var(--ink);
 }
 
+/* ---- PDF-style process guide: paginated walkthrough for sighted users ---- */
+.tour-guide {
+  max-width: 600px;
+}
+/* Slim document progress bar (page X of Y) */
+.tour-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.tour-progress-bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--action);
+  border-radius: 999px;
+  /* Grow the fill with scaleX (compositor-only) instead of animating width,
+     which would trigger layout on every frame. */
+  transition: transform 0.35s ease;
+}
+/* One centred "page" per step; min-height keeps the card steady between pages */
+.tour-page {
+  min-height: 200px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.tour-page .tour-icon {
+  font-size: 3rem;
+}
+/* Page-turn cue — slides/fades in on each page (transform+opacity only).
+   Fully disabled under the global html[data-reduced-motion="true"] reset. */
+.tour-page {
+  animation: tour-page-in 0.32s ease both;
+}
+@keyframes tour-page-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.tour-pagenum {
+  margin: 0;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+html[data-contrast="high"] .tour-pagenum {
+  color: var(--ink);
+}
+
+/* "Read everything aloud" (Nur-Audio) — trigger + hands-free playback panel. */
+.tour-audio-all {
+  width: 100%;
+  margin: 6px 0 14px;
+}
+.tour-audio {
+  text-align: center;
+}
+.tour-audio-icon {
+  display: block;
+  font-size: 2.4rem;
+  line-height: 1;
+  margin: 6px 0 12px;
+}
+.tour-audio-status {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+html[data-contrast="high"] .tour-audio-status {
+  color: var(--ink);
+}
+.tour-actions-audio {
+  justify-content: center;
+  margin-top: 18px;
+}
+
 /* ============================================================
    Voice agent (OpenAI Realtime) — floating launcher + panel
    ============================================================ */
@@ -1932,6 +2256,70 @@ html[data-contrast="high"] .voice-fab {
 @keyframes voice-pop {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: none; }
+}
+
+/* ---- Already-voted alert dialog (Done screen: once the finalisation code is
+   shown the vote is final, so restart is refused). Civic modal — sharp corners,
+   tokenised colours, reduced-motion safe; reuses the voice modal's keyframes. ---- */
+.alert-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  background: rgba(15, 20, 30, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: voice-fade 0.2s ease;
+}
+.alert-dialog {
+  width: min(420px, calc(100vw - 32px));
+  background: var(--surface);
+  color: var(--ink);
+  border: 2px solid var(--action);
+  border-radius: var(--radius);
+  box-shadow: var(--elev);
+  padding: 26px 24px;
+  text-align: center;
+  animation: voice-pop 0.24s ease;
+}
+.alert-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--action) 12%, var(--surface));
+  border: 2px solid color-mix(in srgb, var(--action) 45%, transparent);
+  color: var(--action);
+  font-size: 1.7rem;
+  line-height: 1;
+}
+.alert-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.alert-body {
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+}
+.alert-actions {
+  display: flex;
+  justify-content: center;
+}
+html[data-contrast="high"] .alert-dialog {
+  border-width: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .alert-backdrop,
+  .alert-dialog {
+    animation: none;
+  }
 }
 
 /* ---- Talking robot (pure CSS, decorative) ---- */
