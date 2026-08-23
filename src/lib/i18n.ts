@@ -26,7 +26,7 @@ const de: Dict = {
   voiceControlOff: "Sprachsteuerung aus",
   "tutorial.voiceHint": "Sagen Sie «weiter», «zurück» oder «wiederholen».",
   "tutorial.autoWelcome":
-    "Willkommen bei StimmZugang, dem barrierefreien E-Voting. Sind Sie blind oder sehbehindert? Dann drücken Sie jetzt die Eingabetaste — das aktiviert Vorlesen und Sprachbedienung. Andernfalls wählen Sie Ihr Profil: Standard, Motorisch eingeschränkt, Einfache Sprache oder Grosse Ansicht. Drücken Sie dazu die Tabulatortaste.",
+    "Willkommen bei StimmZugang, dem barrierefreien E-Voting. Sind Sie blind oder sehbehindert? Dann drücken Sie jetzt die Eingabetaste — unsere Sprach-Assistentin Vera begrüsst Sie und richtet alles im Gespräch mit Ihnen ein. Andernfalls wählen Sie Ihr Profil mit der Tabulatortaste.",
   "tutorial.chooseProfile": "Profil wählen",
   "practice.open": "Üben",
   "practice.title": "Übungsmodus",
@@ -95,6 +95,8 @@ const de: Dict = {
   scanQrFront: "Frontkamera",
   scanQrBack: "Rückkamera",
   startOver: "Von vorne beginnen",
+  "tutorial.vera": "Mit Vera sprechen",
+  "tutorial.veraHint": "Unsere Sprach-Assistentin begrüsst Sie, fragt nach Ihren Bedürfnissen und richtet alles im Gespräch ein.",
   login: "Anmelden",
   autofill: "Ausfüllen",
   demoHint: "Demo: Feld ist leer – tippen Sie auf „Ausfüllen“.",
@@ -259,7 +261,7 @@ const en: Dict = {
   voiceControlOff: "Voice control off",
   "tutorial.voiceHint": "Say «next», «back» or «repeat».",
   "tutorial.autoWelcome":
-    "Welcome to StimmZugang, accessible e-voting. Are you blind or visually impaired? Then press Enter now — that turns on read-aloud and voice control. Otherwise choose your profile: Standard, Motor impairment, Easy language or Large view. Press the Tab key to do so.",
+    "Welcome to StimmZugang, accessible e-voting. Are you blind or visually impaired? Then press Enter now — our voice assistant Vera will greet you and set everything up in conversation with you. Otherwise choose your profile with the Tab key.",
   "tutorial.chooseProfile": "Choose profile",
   "practice.open": "Practice",
   "practice.title": "Practice mode",
@@ -323,6 +325,8 @@ const en: Dict = {
   scanQrFront: "Front camera",
   scanQrBack: "Back camera",
   startOver: "Start over",
+  "tutorial.vera": "Talk to Vera",
+  "tutorial.veraHint": "Our voice assistant greets you, asks about your needs and sets everything up in conversation.",
   login: "Sign in",
   autofill: "Autofill",
   demoHint: "Demo: field is empty — tap “Autofill”.",
@@ -472,7 +476,7 @@ const fr: Dict = {
   voiceControlOff: "Commande vocale désactivée",
   "tutorial.voiceHint": "Dites « suivant », « retour » ou « répéter ».",
   "tutorial.autoWelcome":
-    "Bienvenue sur StimmZugang, le vote électronique sans barrières. Êtes-vous aveugle ou malvoyant ? Appuyez alors sur Entrée — cela active la lecture à voix haute et la commande vocale. Sinon, choisissez votre profil : Standard, Handicap moteur, Langage simplifié ou Grand affichage. Appuyez sur la touche Tabulation pour cela.",
+    "Bienvenue sur StimmZugang, le vote électronique sans barrières. Êtes-vous aveugle ou malvoyant ? Appuyez alors sur Entrée — notre assistante vocale Vera vous accueille et configure tout en conversation avec vous. Sinon, choisissez votre profil avec la touche Tabulation.",
   "tutorial.chooseProfile": "Choisir le profil",
   "tutorial.keyboard": "Clavier : Tab déplace, Entrée choisit, Échap ferme.",
   "tutorial.suggestContrast": "Votre système préfère un contraste élevé.",
@@ -555,6 +559,8 @@ const fr: Dict = {
   scanQrFront: "Caméra avant",
   scanQrBack: "Caméra arrière",
   startOver: "Recommencer",
+  "tutorial.vera": "Parler avec Vera",
+  "tutorial.veraHint": "Notre assistante vocale vous accueille, demande vos besoins et configure tout en conversation.",
   login: "Se connecter",
   autofill: "Remplir",
   demoHint: "Démo : le champ est vide — appuyez sur « Remplir ».",
@@ -699,7 +705,7 @@ const it: Dict = {
   voiceControlOff: "Comando vocale disattivato",
   "tutorial.voiceHint": "Dica «avanti», «indietro» o «ripeti».",
   "tutorial.autoWelcome":
-    "Benvenuto su StimmZugang, il voto elettronico senza barriere. È cieco o ipovedente? Allora prema Invio — attiva la lettura ad alta voce e il comando vocale. Altrimenti scelga il suo profilo: Standard, Disabilità motoria, Linguaggio semplice o Visualizzazione grande. Prema il tasto Tab per farlo.",
+    "Benvenuto su StimmZugang, il voto elettronico senza barriere. È cieco o ipovedente? Allora prema Invio — la nostra assistente vocale Vera la accoglie e configura tutto conversando con lei. Altrimenti scelga il suo profilo con il tasto Tab.",
   "tutorial.chooseProfile": "Scegli il profilo",
   "tutorial.keyboard": "Tastiera: Tab si sposta, Invio sceglie, Esc chiude.",
   "tutorial.suggestContrast": "Il suo sistema preferisce un contrasto elevato.",
@@ -783,6 +789,8 @@ const it: Dict = {
   scanQrFront: "Fotocamera anteriore",
   scanQrBack: "Fotocamera posteriore",
   startOver: "Ricominciare",
+  "tutorial.vera": "Parlare con Vera",
+  "tutorial.veraHint": "La nostra assistente vocale la accoglie, chiede le sue esigenze e configura tutto conversando.",
   login: "Accedi",
   autofill: "Compila",
   demoHint: "Demo: il campo è vuoto — tocchi “Compila”.",
@@ -934,7 +942,7 @@ const deLeicht: Dict = {
   // onboarding tour — simpler wording
   "tutorial.blindMode": "Modus für Blinde",
   "tutorial.autoWelcome":
-    "Willkommen bei StimmZugang. Sind Sie blind? Dann drücken Sie jetzt die Eingabetaste. Dann liest die App alles vor. Sonst wählen Sie unten Ihr Profil.",
+    "Willkommen bei StimmZugang. Sind Sie blind? Dann drücken Sie jetzt die Eingabetaste. Dann spricht Vera mit Ihnen und stellt alles ein. Sonst wählen Sie unten Ihr Profil.",
   "tutorial.chooseProfile": "Profil wählen",
   "tutorial.s1.title": "Willkommen",
   "tutorial.s1.body":

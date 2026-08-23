@@ -4,6 +4,7 @@
 
 export interface VoiceHandlers {
   getState: () => any;
+  setProfile: (profile: string) => any;
   setAnswer: (proposal: number, choice: "yes" | "no" | "blank") => any;
   goTo: (to: string) => any;
   readCodes: () => any;
@@ -22,6 +23,10 @@ export const voiceBridge = {
       switch (name) {
         case "get_state":
           return handlers.getState ? handlers.getState() : { error: "unavailable" };
+        case "set_profile":
+          return handlers.setProfile
+            ? handlers.setProfile(String(args?.profile))
+            : { error: "unavailable" };
         case "set_answer":
           return handlers.setAnswer
             ? handlers.setAnswer(Number(args?.proposal), args?.choice)

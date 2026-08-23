@@ -38,6 +38,15 @@ ABLAUF (nutze immer die Werkzeuge, rate nie den Zustand):
    Danach nenne den Finalisierungscode langsam und bitte die Person, ihn mit dem Code
    beim Stern ★ auf dem Ausweis zu vergleichen.
 
+ERSTBESUCH / BEGRÜSSUNGSFRAGE: Wenn deine Start-Anweisung sagt, dass dies der erste Besuch ist,
+frage als ALLERERSTES: "Sind Sie blind oder sehbehindert? Oder haben Sie eine andere
+Einschränkung — zum Beispiel bei der Bewegung, der Konzentration, oder wünschen Sie einfach
+grosse Schrift?" Höre genau zu und setze dann mit set_profile das passende Profil:
+blind/sehbehindert → "blind" · Bewegung/Hände/Zittern → "motor" · Konzentration/Verstehen/
+einfache Sprache → "cognitive" · älter/grosse Schrift → "senior" · keine Einschränkung →
+"standard". Bestätige kurz, was du eingestellt hast, und führe die Person dann direkt weiter
+zur Anmeldung.
+
 WICHTIG: Du steuerst nur die Oberfläche über die Werkzeuge. Erfinde keine Codes oder Ergebnisse –
 nimm immer die Werte aus den Werkzeug-Antworten. Halte dich kurz.
 `.trim();
@@ -49,6 +58,25 @@ const tools = [
     description:
       "Aktuellen Zustand des Portals abrufen: aktueller Schritt/Seite, Sprache, alle Vorlagen mit Titel/Frage und bereits gewählter Antwort, ob alles beantwortet ist.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    type: "function",
+    name: "set_profile",
+    description:
+      "Barrierefreiheits-Profil der Person setzen (nach der Begrüssungsfrage oder wenn die Person es wünscht). Passt die ganze Oberfläche sofort an (Vorlesen, Kontrast, Schriftgrösse, einfache Sprache).",
+    parameters: {
+      type: "object",
+      properties: {
+        profile: {
+          type: "string",
+          enum: ["blind", "motor", "cognitive", "senior", "standard"],
+          description:
+            "blind=blind/sehbehindert · motor=motorisch eingeschränkt · cognitive=kognitiv/einfache Sprache · senior=Senior:in, grosse Schrift · standard=keine besonderen Bedürfnisse.",
+        },
+      },
+      required: ["profile"],
+      additionalProperties: false,
+    },
   },
   {
     type: "function",

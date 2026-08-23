@@ -366,23 +366,37 @@ export default function OnboardingTour({
                   </button>
                 </div>
               )}
-              {/* Blind path: one tap enables blind mode (read-aloud + voice
-                  control) and closes the tour — the visual guide is for sighted
-                  users, so blind users are not walked through pages they can't
-                  see; the voice assistant and read-aloud carry them onward. */}
+              {/* Primary path (autofocused → Enter works blind): start a live
+                  conversation with Vera. She asks the "blind or other
+                  impairment?" question by voice and applies the profile herself
+                  via the set_profile tool — the visual card is the fallback.
+                  Dispatch + onClose happen inside this click, so the user
+                  gesture carries over to mic + audio. */}
               <button
                 type="button"
                 ref={blindBtnRef}
                 className="btn btn-primary tour-blind"
                 onClick={() => {
-                  a.setProfile("blind");
+                  window.dispatchEvent(new CustomEvent("vera:start", { detail: { welcome: true } }));
                   onClose();
                 }}
               >
-                <span aria-hidden="true">🔊</span> {a.tr("tutorial.blindMode")}
+                <span aria-hidden="true">🎙️</span> {a.tr("tutorial.vera")}
               </button>
-              <span className="tour-hint">{a.tr("tutorial.blindModeHint")}</span>
+              <span className="tour-hint">{a.tr("tutorial.veraHint")}</span>
               <div className="tour-actions-row">
+                {/* No-conversation blind path kept as fallback: one tap enables
+                    read-aloud + voice control without the AI assistant. */}
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => {
+                    a.setProfile("blind");
+                    onClose();
+                  }}
+                >
+                  <span aria-hidden="true">🔊</span> {a.tr("tutorial.blindMode")}
+                </button>
                 <button
                   type="button"
                   className="btn btn-ghost"

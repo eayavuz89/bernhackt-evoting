@@ -3,7 +3,7 @@ import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Toolbar from "./components/Toolbar";
 import VoiceAgent from "./components/VoiceAgent";
 import OnboardingTour from "./components/OnboardingTour";
-import { useA11y } from "./context/AccessibilityContext";
+import { useA11y, Profile } from "./context/AccessibilityContext";
 import ProfileSelect from "./screens/ProfileSelect";
 import Login from "./screens/Login";
 import Ballot from "./screens/Ballot";
@@ -52,6 +52,17 @@ export default function App() {
         })),
         allAnswered: PROPOSALS.every((p) => answersRef.current[p.id]),
       }),
+      // Vera's welcome question ("are you blind, or …?") lands here: apply the
+      // matching accessibility profile and dismiss the visual tour — the voice
+      // conversation replaces it.
+      setProfile: (profile) => {
+        const valid = ["standard", "blind", "motor", "cognitive", "senior"];
+        if (!valid.includes(profile)) return { error: "bad_profile", profile };
+        a.setProfile(profile as Profile);
+        a.setOnboardingSeen(true);
+        setTourOpen(false);
+        return { ok: true, profile };
+      },
       setAnswer: (proposal, choice) => {
         const p = PROPOSALS[proposal - 1];
         if (!p) return { error: "no_such_proposal", proposal };

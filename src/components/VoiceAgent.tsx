@@ -27,7 +27,26 @@ export default function VoiceAgent() {
   const timerRef = useRef<number | null>(null);
   const partial = useRef<{ user: string; assistant: string }>({ user: "", assistant: "" });
 
+  // True when this session was opened from the first-visit welcome card: Vera
+  // then asks the "are you blind / which impairment?" question and sets the
+  // profile herself (set_profile tool) instead of the visual card doing it.
+  const welcomeRef = useRef(false);
+
   useEffect(() => () => hangup(), []); // cleanup on unmount
+
+  // Imperative start from other components (welcome card). The event is
+  // dispatched synchronously inside a click handler, so the browser still
+  // treats mic + audio as user-gesture-initiated.
+  const startRef = useRef<() => void>(() => {});
+  startRef.current = start;
+  useEffect(() => {
+    const onStart = (e: Event) => {
+      welcomeRef.current = !!(e as CustomEvent).detail?.welcome;
+      if (!pcRef.current) startRef.current();
+    };
+    window.addEventListener("vera:start", onStart);
+    return () => window.removeEventListener("vera:start", onStart);
+  }, []);
 
   // Closing the panel ends a running session (mic must never stay hot unseen).
   useEffect(() => {
@@ -183,17 +202,19 @@ export default function VoiceAgent() {
         }
       };
       dc.onopen = () => {
-        // greet + kick off the flow
+        // greet + kick off the flow (first visit: Vera asks the profile question
+        // herself and applies the answer via set_profile)
+        const welcome = welcomeRef.current
+          ? "Dies ist der ERSTE BESUCH dieser Person. Begrüsse sie kurz und warm auf Deutsch als Sprach-Assistentin Vera und stelle sofort die Begrüssungsfrage: Ist die Person blind oder sehbehindert, oder hat sie eine andere Einschränkung (Bewegung, Konzentration, Wunsch nach grosser Schrift)? Setze die Antwort mit set_profile um, bestätige kurz und führe dann zur Anmeldung."
+          : "Begrüsse die Person kurz und warm auf Deutsch als Sprach-Assistentin Vera. " +
+            "Sag, dass du beim Abstimmen hilfst. Rufe dann get_state auf und leite die Person durch den nächsten Schritt.";
         dc.send(
           JSON.stringify({
             type: "response.create",
-            response: {
-              instructions:
-                "Begrüsse die Person kurz und warm auf Deutsch als Sprach-Assistentin Vera. " +
-                "Sag, dass du beim Abstimmen hilfst. Rufe dann get_state auf und leite die Person durch den nächsten Schritt.",
-            },
+            response: { instructions: welcome },
           })
         );
+        welcomeRef.current = false;
       };
 
       // 5) SDP offer -> OpenAI, apply answer
