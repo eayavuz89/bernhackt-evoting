@@ -54,7 +54,7 @@ export default function PracticeMode({ onClose }: { onClose: () => void }) {
   }, []);
 
   // Hands-free: speak "ja / nein / leer" to choose, "wiederholen" to re-hear.
-  useVoiceCommands(a.voiceControl, a.lang, {
+  useVoiceCommands(a.voiceControl && !a.voiceSession, a.lang, {
     onChoice: (c) => pick(c),
     onRepeat: () => a.speak(a.tr("practice.question")),
     onClose: () => onCloseRef.current(),

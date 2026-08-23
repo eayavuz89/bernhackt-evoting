@@ -14,6 +14,11 @@ interface A11yState {
   readAloud: boolean;
   soundCues: boolean; // earcons — audible feedback for each state change
   voiceControl: boolean; // hands-free speech commands (weiter/zurück/…)
+  // True while a live conversation with the Realtime assistant (Vera) is running.
+  // Read-aloud and browser voice commands are suspended for its duration —
+  // two voices (or two mic consumers) at once are chaos, not accessibility.
+  voiceSession: boolean;
+  setVoiceSession: (b: boolean) => void;
   onboardingSeen: boolean;
   setProfile: (p: Profile) => void;
   setLang: (l: Lang) => void;
@@ -87,6 +92,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   const [readAloud, setReadAloud] = useState(saved.readAloud ?? false);
   const [soundCues, setSoundCues] = useState(saved.soundCues ?? false);
   const [voiceControl, setVoiceControl] = useState(saved.voiceControl ?? false);
+  const [voiceSession, setVoiceSession] = useState(false); // never persisted — live state only
   // First-open onboarding flag — once the welcome tour is dismissed it never
   // auto-opens again (users re-open it from the accessibility menu).
   const [onboardingSeen, setOnboardingSeen] = useState(saved.onboardingSeen ?? false);
@@ -139,6 +145,10 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
 
   const speak = useCallback(
     (text: string, onEnd?: () => void) => {
+      if (voiceSession) {
+        onEnd?.(); // Vera is talking — swallow page TTS, but let chains advance
+        return;
+      }
       if (!("speechSynthesis" in window)) {
         onEnd?.(); // no TTS: still let a chain advance rather than stall
         return;
@@ -163,7 +173,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       // it; it's a no-op when not paused, so it's always safe to call.
       window.speechSynthesis.resume();
     },
-    [lang]
+    [lang, voiceSession]
   );
 
   const value = useMemo<A11yState>(
@@ -177,6 +187,8 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       readAloud,
       soundCues,
       voiceControl,
+      voiceSession,
+      setVoiceSession,
       onboardingSeen,
       setProfile,
       setLang,
@@ -191,7 +203,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       speak,
       stopSpeak,
     }),
-    [profile, lang, easy, fontScale, contrast, reducedMotion, readAloud, soundCues, voiceControl, onboardingSeen, setProfile, tr, speak, stopSpeak]
+    [profile, lang, easy, fontScale, contrast, reducedMotion, readAloud, soundCues, voiceControl, voiceSession, onboardingSeen, setProfile, tr, speak, stopSpeak]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

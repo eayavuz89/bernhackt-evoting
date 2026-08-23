@@ -116,6 +116,11 @@ export default function VoiceAgent() {
       /* ignore */
     }
 
+    // Vera takes over all audio: cut any running page read-aloud and suspend
+    // TTS + browser voice commands for the whole session (see AccessibilityContext).
+    a.stopSpeak();
+    a.setVoiceSession(true);
+
     setError("");
     setLines([]);
     setStatus("connecting");
@@ -233,6 +238,7 @@ export default function VoiceAgent() {
     micRef.current = null;
     if (audioRef.current) audioRef.current.srcObject = null;
     setNeedsUnlock(false);
+    a.setVoiceSession(false); // hand audio back to read-aloud / voice commands
   }
 
   function hangup(capped = false) {

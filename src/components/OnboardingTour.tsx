@@ -214,7 +214,7 @@ export default function OnboardingTour({
   }, [firstRun]);
 
   // Hands-free navigation: speak "weiter / zurück / wiederholen" to move around.
-  useVoiceCommands(a.voiceControl, a.lang, {
+  useVoiceCommands(a.voiceControl && !a.voiceSession, a.lang, {
     onNext: () => (isGuide ? goNext() : startGuide()),
     onBack: () => (isGuide ? goBack() : undefined),
     onRepeat: () => a.speak(narration),
