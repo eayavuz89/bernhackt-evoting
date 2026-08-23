@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useA11y, Profile } from "../context/AccessibilityContext";
+import { useA11y, Profile, A11Y_STORAGE_KEY } from "../context/AccessibilityContext";
 import { LANGS, Lang } from "../lib/i18n";
 import Dropdown from "./Dropdown";
 
@@ -65,6 +65,24 @@ export default function Toolbar({ onOpenTutorial }: { onOpenTutorial: () => void
         <span className="brand">
           <img className="brand-logo" src="/logo.png" alt={a.tr("appName")} />
         </span>
+
+        {/* Full restart: wipe the persisted preferences and hard-reload to "/",
+            so the first-visit questions (profile onboarding) run again and any
+            in-memory vote state is gone — a shared/demo device starts pristine. */}
+        <button
+          type="button"
+          className="restart-btn"
+          onClick={() => {
+            try {
+              window.localStorage.removeItem(A11Y_STORAGE_KEY);
+            } catch {
+              /* storage blocked — reload still resets the in-memory state */
+            }
+            window.location.href = "/";
+          }}
+        >
+          <span aria-hidden="true">↺</span> {a.tr("startOver")}
+        </button>
 
         <div className="a11y-wrap" ref={wrapRef}>
           <button

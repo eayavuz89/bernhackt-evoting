@@ -52,7 +52,8 @@ const LANG_VOICE: Record<Lang, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH"
 // Persisted accessibility preferences — restored on reload / direct link so a
 // user who needs high contrast or large text never loses it. reducedMotion is
 // intentionally NOT stored (it always follows the live OS setting).
-const STORAGE_KEY = "stimmzugang:a11y";
+export const A11Y_STORAGE_KEY = "stimmzugang:a11y";
+const STORAGE_KEY = A11Y_STORAGE_KEY;
 
 interface PersistedA11y {
   profile: Profile;
