@@ -254,7 +254,10 @@ export default function VoiceAgent() {
         className={"voice-fab" + (live ? " live" : "")}
         aria-expanded={open}
         aria-label={a.tr("voiceAssistant")}
-        onClick={() => setOpen((o) => !o)}
+        // Opening via the FAB starts the conversation immediately (we are inside
+        // the tap's user gesture — required for mic + audio autoplay). Tapping
+        // again closes the modal, which also hangs up.
+        onClick={() => (open ? setOpen(false) : start())}
       >
         {/* Clean line-art mic (matches the orb glyph) instead of the emoji */}
         <svg
