@@ -52,11 +52,11 @@ export default function VoiceAgent() {
     return () => window.removeEventListener("vera:start", onStart);
   }, []);
 
-  // Closing the panel ends a running session (mic must never stay hot unseen).
+  // Closing the panel no longer ends the session — the glowing FAB is the
+  // on/off control and running indicator; the modal is just an optional view
+  // (unlock button, transcript).
   useEffect(() => {
-    if (open) return;
-    a.stopSpeak();
-    if (pcRef.current) hangup();
+    if (!open) a.stopSpeak();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -178,7 +178,9 @@ export default function VoiceAgent() {
     setError("");
     setLines([]);
     setStatus("connecting");
-    setOpen(true);
+    // NOTE: the modal is deliberately NOT opened — Vera runs "invisibly", the
+    // glowing FAB is the running indicator. The modal (transcript, unlock,
+    // errors) still exists and auto-opens only when sound must be unlocked.
     try {
       // 1) ephemeral token from our backend
       const tr = await fetch("/api/realtime/token", {
@@ -213,7 +215,12 @@ export default function VoiceAgent() {
         el.volume = 1;
         el.play().then(
           () => setNeedsUnlock(false),
-          () => setNeedsUnlock(true) // browser blocked autoplay → show "enable sound"
+          () => {
+            // Browser blocked autoplay: this is the one case where the modal
+            // must appear — the unlock button lives there.
+            setNeedsUnlock(true);
+            setOpen(true);
+          }
         );
       };
       // addTrack creates a sendrecv transceiver → we both send mic and receive model audio.
@@ -317,13 +324,13 @@ export default function VoiceAgent() {
       {/* Floating launcher */}
       <button
         type="button"
-        className={"voice-fab" + (live ? " live" : "")}
-        aria-expanded={open}
+        className={"voice-fab" + (live ? " live" : connecting ? " connecting" : "")}
+        aria-pressed={live || connecting}
         aria-label={a.tr("voiceAssistant")}
-        // Opening via the FAB starts the conversation immediately (we are inside
-        // the tap's user gesture — required for mic + audio autoplay). Tapping
-        // again closes the modal, which also hangs up.
-        onClick={() => (open ? setOpen(false) : start())}
+        // One tap starts the conversation (inside the tap's user gesture —
+        // required for mic + audio autoplay); the FAB glows while Vera runs.
+        // Tapping again hangs up. No popup by default.
+        onClick={() => (live || connecting ? (setOpen(false), hangup()) : start())}
       >
         {/* Clean line-art mic (matches the orb glyph) instead of the emoji */}
         <svg

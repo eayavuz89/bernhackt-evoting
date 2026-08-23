@@ -2970,3 +2970,26 @@ html[data-contrast="high"] .scan-frame {
     font-size: 0.85rem;
   }
 }
+
+/* ---- FAB as the running indicator (no popup by default) ---- */
+.voice-fab.live {
+  animation: fab-glow 1.4s ease-in-out infinite;
+}
+.voice-fab.connecting {
+  animation: fab-glow 0.7s ease-in-out infinite;
+  opacity: 0.85;
+}
+@keyframes fab-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--action-tint), 0 0 18px 2px var(--action-tint);
+  }
+  50% {
+    box-shadow: 0 0 0 12px transparent, 0 0 30px 8px var(--action-tint);
+  }
+}
+html[data-reduced-motion="true"] .voice-fab.live,
+html[data-reduced-motion="true"] .voice-fab.connecting {
+  animation: none;
+  box-shadow: 0 0 22px 6px var(--action-tint);
+}
