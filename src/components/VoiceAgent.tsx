@@ -210,8 +210,12 @@ export default function VoiceAgent() {
       const { value: ephemeral } = await tr.json();
       if (!ephemeral) throw new Error("no_token");
 
-      // 2) mic
-      const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 2) mic — explicitly request echo cancellation: without it Vera's own
+      // voice from the speaker re-enters the mic and barge-in cuts her off
+      // mid-greeting (worst on phones in speaker mode).
+      const mic = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      });
       micRef.current = mic;
 
       // 3) peer connection

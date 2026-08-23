@@ -29,14 +29,19 @@ const VAD_THRESHOLD = Number(process.env.VAD_THRESHOLD || 0.85); // 0..1, higher
 const VAD_PREFIX_MS = Number(process.env.VAD_PREFIX_MS || 300);
 const VAD_SILENCE_MS = Number(process.env.VAD_SILENCE_MS || 800);
 const NOISE_REDUCTION = process.env.NOISE_REDUCTION || "far_field"; // near_field | far_field | off
+// Set INTERRUPT_RESPONSE=0 to disable barge-in entirely: Vera always finishes
+// speaking; user speech is still detected but only answered afterwards. The
+// robust choice when speaker→mic echo keeps cutting her off.
+const INTERRUPT_RESPONSE = process.env.INTERRUPT_RESPONSE !== "0";
 
 function turnDetection() {
-  if (VAD_TYPE === "semantic_vad") return { type: "semantic_vad" };
+  if (VAD_TYPE === "semantic_vad") return { type: "semantic_vad", interrupt_response: INTERRUPT_RESPONSE };
   return {
     type: "server_vad",
     threshold: VAD_THRESHOLD,
     prefix_padding_ms: VAD_PREFIX_MS,
     silence_duration_ms: VAD_SILENCE_MS,
+    interrupt_response: INTERRUPT_RESPONSE,
   };
 }
 
