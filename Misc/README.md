@@ -2,15 +2,23 @@
 
 Links, Assets, Notizen und Review-Artefakte — alles, was nicht in Code / Documentation / Presentation gehört.
 
+## Inhalt
+
+- [`review/`](./review/) — **Multi-Rollen-Review** des Codes (PO · Software-Architect · Senior FE ·
+  Senior BE · Security). Siehe [`review/REVIEW.md`](./review/REVIEW.md).
+- [`assets/`](./assets/) — Screenshots des Portal-Flows, der Profile, des hohen Kontrasts, von Vera
+  und des Musterausweises. Logo: `../public/logo.png`.
+- `notes/` — Meeting-/Scratch-Notizen. `TODO` (Joker).
+
 ## Nützliche Links
-- BärnHäckt 2026 — `TODO`
-- Swiss-Post-E-Voting-Demo — https://demo.evoting.ch/ (Anmeldung im Demo: Geburtsjahr **1980**)
-- Swiss-Post-E-Voting-GitLab (Doku, Zertifikats-/Voter-Portal-Verifikation) — `TODO`
 
-## Vorgeschlagene Struktur
-- `review/` — Multi-Rollen-Review (PO · Software-Architect · Senior FE · Senior BE · Security).
-- `assets/` — Logos, Screenshots, QR-Codes.
-- `notes/` — Meeting-/Scratch-Notizen.
+- **Live-Demo (unser Prototyp):** https://evoting.eayavuz.com · Musterausweis: `/card`
+- **Swiss-Post-E-Voting-Demo:** https://demo.evoting.ch/ (Demo-Anmeldung: Geburtsjahr **1980**)
+- **BärnHäckt 2026 (Event/Abgabe):** `TODO` — Link fehlt (Joker liefert)
+- **Swiss-Post-E-Voting-GitLab** (Doku, Zertifikats-/Voter-Portal-Verifikation): `TODO` — Link fehlt (Joker liefert)
 
-> Der vollständige Review-Bericht (Requirements-Abdeckung, Security, Clean Code, Performance,
-> AI-Design-Check) liegt bereits vor und kann hier als `review/REVIEW.md` abgelegt werden.
+## Demo-Werte (gemockt)
+
+- Geburtsjahr (Extended Authentication Factor): **1980**
+- Initialisierungscode ▲: im Demo vorausgefüllt / per „Ausfüllen"-Button ladbar
+- Prüf-/Bestätigungs-/Finalisierungscodes: siehe `../src/lib/data.ts` (Demo-Werte)

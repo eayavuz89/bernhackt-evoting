@@ -25,7 +25,7 @@ Voice-Backend (Sprach-Assistentin „Vera"): siehe [`server/`](./server/) + [`.e
 ## Checkliste
 
 - [x] **Code** — lauffähig, siehe `README.md`
-- [ ] **Documentation / technical-jury** — Gerüst angelegt, Inhalt offen
-- [ ] **Documentation / challenger** — Gerüst angelegt, Inhalt offen
+- [x] **Documentation / technical-jury** — ausgefüllt (Architektur, A11y, Sicherheit, Flow, Voice, Deploy, Grenzen)
+- [x] **Documentation / challenger** — ausgefüllt (Anforderungsabdeckung, Extras, ehrliche Grenzen)
 - [ ] **Presentation** — Gerüst angelegt, Deck offen
-- [ ] **Misc** — Links/Assets/Review offen
+- [x] **Misc** — Review (`review/REVIEW.md`) + Screenshots (`assets/`) vorhanden; einige externe Links noch `TODO`
