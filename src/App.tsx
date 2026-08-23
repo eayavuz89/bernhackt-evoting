@@ -22,8 +22,23 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
-  // Welcome tour: auto-opens on first visit; re-openable from the a11y menu.
-  const [tourOpen, setTourOpen] = useState(!a.onboardingSeen);
+  // Visual tour no longer auto-opens: on first visit Vera greets directly
+  // (below). Still re-openable from the a11y menu.
+  const [tourOpen, setTourOpen] = useState(false);
+
+  // First visit: no page TTS, no welcome card — start a live Vera session in
+  // welcome mode. She asks "blind, or which impairment?" by voice, applies the
+  // answer via set_profile and routes onward to the login step. If the mic/audio
+  // is declined the person simply lands on the profile-select home page.
+  useEffect(() => {
+    if (a.onboardingSeen || location.pathname === "/card") return;
+    a.setOnboardingSeen(true);
+    const t = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("vera:start", { detail: { welcome: true } }));
+    }, 400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Refs so voice-agent tool calls always read the latest state.
   const answersRef = useRef(answers);
