@@ -13,13 +13,13 @@ export default function Login() {
   const a = useA11y();
   const nav = useNavigate();
   const [sp] = useSearchParams();
-  // Empty by default; the "Ausfüllen" button next to the field fills the demo
-  // code on demand. The card's QR still deep-links here with ?init=<code>
-  // (one-tap sign-in for motor-impaired users), which pre-fills the field.
-  const [code, setCode] = useState(sp.get("init") || "");
+  // Demo: everything arrives pre-filled and pre-checked so one tap on
+  // "Anmelden" continues. The card's QR deep link (?init=<code>) still wins
+  // over the default demo code.
+  const [code, setCode] = useState(sp.get("init") || CARD.initCode);
   const [year, setYear] = useState(CARD.birthYear);
-  const [legal1, setLegal1] = useState(false);
-  const [legal2, setLegal2] = useState(false);
+  const [legal1, setLegal1] = useState(true);
+  const [legal2, setLegal2] = useState(true);
   const [error, setError] = useState("");
   // Which field the current warning refers to, so only that field's border
   // turns red — not every input on the screen.
