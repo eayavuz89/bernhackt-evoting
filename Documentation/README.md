@@ -2,6 +2,8 @@
 
 📹 **Demo-Video:** [StimmZugang – barrierefreies E-Voting auf YouTube ansehen](https://youtu.be/KedjHvjwRrM)
 
+🖥️ **Pitch-Deck:** [StimmZugang-Präsentation (PDF)](./StimmZugang-Praesentation.pdf)
+
 Zwei Dokumente für die Abgabe:
 
 - [`technical-jury/`](./technical-jury/) — **Dokument für die technische Jury**: Architektur,
