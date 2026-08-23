@@ -25,9 +25,9 @@ const TOKEN_TTL_SECONDS = Number(process.env.TOKEN_TTL_SECONDS || 60);
 // server_vad with a raised threshold ignores background chatter that semantic_vad
 // treats as barge-in; far_field noise reduction targets speaker-mode/room mics.
 const VAD_TYPE = process.env.VAD_TYPE || "server_vad"; // server_vad | semantic_vad
-const VAD_THRESHOLD = Number(process.env.VAD_THRESHOLD || 0.75); // 0..1, higher = needs louder speech
+const VAD_THRESHOLD = Number(process.env.VAD_THRESHOLD || 0.85); // 0..1, higher = needs louder speech
 const VAD_PREFIX_MS = Number(process.env.VAD_PREFIX_MS || 300);
-const VAD_SILENCE_MS = Number(process.env.VAD_SILENCE_MS || 700);
+const VAD_SILENCE_MS = Number(process.env.VAD_SILENCE_MS || 800);
 const NOISE_REDUCTION = process.env.NOISE_REDUCTION || "far_field"; // near_field | far_field | off
 
 function turnDetection() {

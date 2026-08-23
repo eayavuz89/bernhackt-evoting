@@ -19,5 +19,10 @@ services:
       - PER_IP_PER_MIN=3
       - PER_IP_PER_HOUR=12
       - GLOBAL_PER_DAY=300
+      # noisy demo hall: tune via .env without code changes
+      - VAD_TYPE=${VAD_TYPE:-server_vad}
+      - VAD_THRESHOLD=${VAD_THRESHOLD:-0.85}
+      - VAD_SILENCE_MS=${VAD_SILENCE_MS:-800}
+      - NOISE_REDUCTION=${NOISE_REDUCTION:-far_field}
     ports:
       - "127.0.0.1:18142:8080"
