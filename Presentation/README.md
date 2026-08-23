@@ -4,6 +4,8 @@ Pitch-Deck für die Jury-Präsentation.
 
 > **Gerüst.** Deck-Datei hier ablegen (`slides.pdf` oder Canva-/Pitch-Link) und Speaker-Notes füllen.
 
+Demo Video : https://www.youtube.com/watch?v=KedjHvjwRrM
+
 ## Slide-Struktur (Vorschlag)
 
 1. **Hook** — `TODO` das Problem: E-Voting ist für viele nicht selbstständig nutzbar.
