@@ -1,5 +1,7 @@
 # Documentation
 
+📹 **Demo-Video:** [StimmZugang – barrierefreies E-Voting auf YouTube ansehen](https://youtu.be/KedjHvjwRrM)
+
 Zwei Dokumente für die Abgabe:
 
 - [`technical-jury/`](./technical-jury/) — **Dokument für die technische Jury**: Architektur,
