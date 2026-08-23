@@ -18,7 +18,6 @@ export default function VoiceAgent() {
   const [open, setOpen] = useState(false);
   const [lines, setLines] = useState<Line[]>([]);
   const [needsUnlock, setNeedsUnlock] = useState(false); // autoplay blocked → user must tap
-  const [greeting, setGreeting] = useState(false); // demo: TTS welcome after tapping the orb
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
@@ -26,36 +25,15 @@ export default function VoiceAgent() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<number | null>(null);
-  const greetTimerRef = useRef<number | null>(null);
   const partial = useRef<{ user: string; assistant: string }>({ user: "", assistant: "" });
 
-  useEffect(
-    () => () => {
-      hangup();
-      if (greetTimerRef.current) clearTimeout(greetTimerRef.current);
-    },
-    []
-  ); // cleanup on unmount
+  useEffect(() => () => hangup(), []); // cleanup on unmount
 
-  // Tap the orb → after a ~1s beat the assistant greets by voice (browser TTS).
-  // Deterministic demo greeting; a live OpenAI realtime conversation still needs
-  // the backend token + key (that path lives in start(), untouched here).
-  function greet() {
-    if (greetTimerRef.current) clearTimeout(greetTimerRef.current);
-    a.stopSpeak();
-    setError("");
-    setGreeting(true);
-    greetTimerRef.current = window.setTimeout(() => {
-      a.speak(a.tr("voiceGreeting"), () => setGreeting(false));
-    }, 1000);
-  }
-
-  // Closing the panel stops the greeting (pending timer + any speech).
+  // Closing the panel ends a running session (mic must never stay hot unseen).
   useEffect(() => {
     if (open) return;
-    if (greetTimerRef.current) clearTimeout(greetTimerRef.current);
     a.stopSpeak();
-    setGreeting(false);
+    if (pcRef.current) hangup();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -305,11 +283,11 @@ export default function VoiceAgent() {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="voice-panel-head">
-            <span className={"voice-dot " + (greeting ? "live" : status)} aria-hidden="true" />
+            <span className={"voice-dot " + status} aria-hidden="true" />
             <strong>
               {connecting
                 ? a.tr("voiceConnecting")
-                : live || greeting
+                : live
                 ? a.tr("voiceListening")
                 : a.tr("voiceAssistant")}
             </strong>
@@ -318,15 +296,15 @@ export default function VoiceAgent() {
             </button>
           </div>
 
-          {/* AI-input animation ("Listening & Thinking") — tap to have the
-              assistant greet you by voice. The video is decorative (the button
-              carries the label); under reduced motion it stays on the still poster
-              frame instead of auto-playing. */}
+          {/* AI-input animation ("Listening & Thinking") — tap to start the live
+              Realtime conversation with Vera (tap again to hang up). The video is
+              decorative (the button carries the label); under reduced motion it
+              stays on the still poster frame instead of auto-playing. */}
           <button
             type="button"
-            className={"voice-orb-video " + (greeting ? "live" : status)}
-            onClick={greet}
-            aria-label={a.tr("voiceTapToStart")}
+            className={"voice-orb-video " + status}
+            onClick={() => (live || connecting ? hangup() : start())}
+            aria-label={live || connecting ? a.tr("close") : a.tr("voiceTapToStart")}
           >
             <video
               className="voice-video"
@@ -346,7 +324,7 @@ export default function VoiceAgent() {
             </p>
           ) : (
             <p className="voice-hint">
-              {greeting ? a.tr("voiceGreeting") : live ? a.tr("voiceSpeakNow") : a.tr("voiceIntro")}
+              {live ? a.tr("voiceSpeakNow") : a.tr("voiceIntro")}
             </p>
           )}
 
