@@ -31,7 +31,7 @@ export default function Done() {
   }
 
   return (
-    <Screen title={a.tr("doneTitle")} help={a.tr("doneHelp")} speakExtra={`${a.tr("finalizeCode")}: ${CARD.finalizeCode}`}>
+    <Screen title={a.tr("doneTitle")} help={a.tr("doneHelp")} speakExtra={`${a.tr("finalizeCode")}: ${CARD.finalizeCode}`} easySym="🎉">
       <div className="done-badge" role="status">
         <span className="done-check" aria-hidden="true">
           ✓

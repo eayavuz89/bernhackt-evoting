@@ -74,7 +74,7 @@ export default function Ballot({ session }: { session: Session }) {
   }, [showEncrypt]);
 
   return (
-    <Screen title={a.tr("ballotTitle")} help={a.tr("ballotHelp")} step={2} totalSteps={4}>
+    <Screen title={a.tr("ballotTitle")} help={a.tr("ballotHelp")} step={2} totalSteps={4} easySym="🗳️">
       {PROPOSALS.map((p, idx) => {
         const chosen = session.answers[p.id];
         // After a failed submit, the proposals still missing an answer get the

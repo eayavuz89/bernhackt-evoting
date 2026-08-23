@@ -70,7 +70,7 @@ export default function Login() {
   };
 
   return (
-    <Screen title={a.tr("loginTitle")} help={a.tr("loginHelp")} step={1} totalSteps={4}>
+    <Screen title={a.tr("loginTitle")} help={a.tr("loginHelp")} step={1} totalSteps={4} easySym="🪪">
       <form className="form" onSubmit={submit} noValidate>
         {/* Legal acknowledgement (official step 1: Gesetzliche Bestimmungen).
             When the "confirm both" warning fires, only the boxes still unchecked

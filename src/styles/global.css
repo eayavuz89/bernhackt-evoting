@@ -564,6 +564,14 @@ html[data-contrast="high"] .home-bg {
 html[data-contrast="high"] .eyebrow {
   color: var(--action);
 }
+/* Leichte Sprache step pictogram: a big, calm comprehension cue above each
+   step's heading (🪪 anmelden · 🗳️ abstimmen · 🔢 prüfen · 🔒 bestätigen · 🎉 fertig).
+   Only rendered in the cognitive profile; decorative for screen readers. */
+.screen-sym {
+  font-size: 3.4rem;
+  line-height: 1;
+  margin: 0 0 14px;
+}
 .screen-title {
   font-family: var(--font-display);
   font-size: clamp(1.7rem, 1.25rem + 2vw, 2.25rem);
@@ -622,49 +630,50 @@ html[data-contrast="high"] .eyebrow {
 .steps-list {
   list-style: none;
   display: flex;
-  gap: 8px;
   padding: 0;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
+/* Each step is a node on a horizontal timeline (Zeitstrahl): a numbered circle
+   joined to the previous node by a connector line. State lives on the node —
+   upcoming = outlined, current = accent ring + tint, done = filled success. */
 .step-dot {
   flex: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0 6px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  position: relative;
-  overflow: hidden;
+  min-height: 2.9em;
 }
-/* progress track along the bottom of each segment */
+/* connector line: spans the GAP between the previous node and this one — it stops
+   at the circle edges (≈ circle radius inset on each side) so it never runs into
+   the circles. Hidden before the first node. Coloured by the node it leads into,
+   so the traversed part of the line fills as you progress. */
 .step-dot::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 5px;
+  top: 50%;
+  left: calc(-50% + 1.5rem);
+  right: calc(50% + 1.5rem);
+  height: 3px;
   background: var(--line);
+  transform: translateY(-50%);
+  z-index: 0;
 }
-/* the piece that partially fills — grows to show progress through the flow */
-.step-dot::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 5px;
-  width: 100%;
-  background: var(--action);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s ease;
+.step-dot:first-child::before {
+  display: none;
 }
+/* the round node itself */
 .step-dot .step-num {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9em;
+  height: 2.9em;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
   font-size: 0.95rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -673,27 +682,24 @@ html[data-contrast="high"] .eyebrow {
 .step-dot .step-num::before {
   content: "0";
 }
-/* current step: half-filled ("in progress"), accent-tinted box */
-.step-dot.current {
+/* current step: accent ring + tint, number in accent; line leading in is filled */
+.step-dot.current .step-num {
   border-color: var(--action);
   background: var(--action-tint);
-}
-.step-dot.current::after {
-  transform: scaleX(1);
-}
-.step-dot.current .step-num {
   color: var(--action);
 }
-/* completed steps: fully filled in success green */
-.step-dot.done {
-  border-color: var(--success);
+.step-dot.current::before {
+  background: var(--action);
 }
-.step-dot.done::after {
-  transform: scaleX(1);
-  background: var(--success);
-}
+/* completed steps: filled blue node; line leading in is filled blue — the
+   traversed timeline reads as one continuous blue path as you progress. */
 .step-dot.done .step-num {
-  color: var(--success);
+  border-color: var(--action);
+  background: var(--action);
+  color: var(--action-ink);
+}
+.step-dot.done::before {
+  background: var(--action);
 }
 .step-text {
   margin: 0;
@@ -901,32 +907,28 @@ html[data-contrast="high"] .profile-icon {
   font-size: 1.16em;
   font-weight: 800;
   letter-spacing: -0.01em;
+  line-height: 1.25;
+  /* Reserve two lines so single-line titles (Standard, Grosse Ansicht) take the
+     same height as the wrapping ones (Blind / Sehbehindert, Motorisch …) — this
+     makes every description START on the same row across the card row. */
+  min-height: 2.5em;
   padding-right: 3.9em; /* keep the title clear of the (now larger) top-right icon */
 }
 .profile-desc {
-  margin-top: auto; /* push the description to a shared baseline near the card foot */
-  padding-top: 6px;
+  /* Start every description at a fixed offset below the (fixed-height) title so
+     their TOP baselines align. Foot-anchoring (margin-top:auto) aligned their
+     BOTTOMS instead, which left one-line descriptions stranded at the card foot. */
+  margin-top: 12px;
   color: var(--ink-soft);
   font-size: 0.95em;
   line-height: 1.5;
 }
-/* Single column (phone): there is no neighbouring card to align descriptions
-   against, so the foot-anchoring above (margin-top:auto + tall min-height) just
-   leaves a big void between title and description. Centre the title+description
-   as one balanced block — title a little lower, description a little higher —
-   and follow the icon down so it stays beside the title. Placed AFTER the base
-   .profile-* rules so these overrides win on source order. */
+/* Single column (phone): icon stays pinned top-right (base rule) with air above
+   the text; just shrink the card a little since there's no neighbour to match
+   heights against. Description alignment is handled by the base rules above. */
 @media (max-width: 480px) {
   .profile-card {
     min-height: 8.25em;
-    justify-content: center;
-  }
-  .profile-desc {
-    margin-top: 0;
-  }
-  .profile-icon {
-    top: 50%;
-    transform: translateY(-50%);
   }
 }
 
@@ -1094,6 +1096,9 @@ html[data-profile="motor"] .btn-autofill {
   clear: both; /* drop below the floated legend */
   color: var(--ink-soft);
   margin: 12px 0 16px;
+  /* Line the sub-question up with the title text above it, not the number badge:
+     badge width (30px) + legend gap (12px). */
+  padding-left: 42px;
 }
 .choice-row {
   display: grid;
@@ -1328,6 +1333,21 @@ html[data-profile="motor"] .choice {
 }
 html[data-profile="motor"] .btn {
   min-height: 64px;
+}
+/* "Grosse Ziele" also applies to text fields and checkboxes, not just buttons:
+   larger hit area for imprecise motor control (Login code/year, legal + confirm
+   acknowledgements). */
+html[data-profile="motor"] .input {
+  min-height: 72px;
+  font-size: 1.4rem;
+}
+html[data-profile="motor"] .confirm-check {
+  padding: 22px;
+  gap: 18px;
+}
+html[data-profile="motor"] .confirm-check input {
+  width: 40px;
+  height: 40px;
 }
 
 /* Cognitive: calmer, single column, larger icons, more whitespace */
@@ -1995,6 +2015,39 @@ html[data-contrast="high"] .tour-backdrop {
   letter-spacing: 0.14em;
   color: var(--action);
 }
+/* First-open welcome (not the guide pages): brand logo on top, and the header,
+   icon, title + intro centred as one column. Scoped via :not(.tour-guide) so the
+   paginated guide keeps its left-aligned reading layout. */
+.tour-logo {
+  display: block;
+  align-self: center;
+  height: 48px;
+  width: auto;
+  margin-bottom: 2px;
+}
+html[data-contrast="high"] .tour-logo {
+  background: #fff;
+  border-radius: 10px;
+  padding: 3px 10px;
+}
+.tour:not(.tour-guide) {
+  position: relative;
+}
+.tour:not(.tour-guide) .tour-head {
+  justify-content: center;
+}
+.tour:not(.tour-guide) .a11y-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+.tour:not(.tour-guide) .tour-body {
+  align-items: center;
+  text-align: center;
+}
+.tour:not(.tour-guide) .tour-text {
+  font-size: 0.98rem;
+}
 .tour .steps {
   margin: 0;
 }
@@ -2116,7 +2169,8 @@ html[data-contrast="high"] .tour-kbd {
      which would trigger layout on every frame. */
   transition: transform 0.35s ease;
 }
-/* One centred "page" per step; min-height keeps the card steady between pages */
+/* One left-aligned "page" per step (title + body read like a document);
+   min-height keeps the card steady between pages, block stays vertically centred */
 .tour-page {
   min-height: 200px;
   align-items: center;
@@ -2205,6 +2259,10 @@ html[data-contrast="high"] .tour-audio-status {
   border-radius: 50%; /* round */
   cursor: pointer;
   box-shadow: var(--elev);
+}
+.voice-fab-mic {
+  width: 30px;
+  height: 30px;
 }
 .voice-fab:hover {
   background: var(--action-strong);
@@ -2458,6 +2516,38 @@ html[data-contrast="high"] .alert-dialog {
    Everything outside the orb stays civic/sharp. Guardrails kept: all motion is
    transform/opacity only and stops fully under reduced-motion; the mic glyph is
    high-contrast white; high-contrast mode swaps the blur for a crisp solid ring. */
+/* AI-input animation centerpiece (Dribbble "Listening & Thinking"). Tappable
+   button wrapping a decorative, muted, looping video; sharp civic frame that
+   turns accent while the assistant is connecting/live. */
+.voice-orb-video {
+  display: block;
+  width: 100%;
+  margin: 6px auto 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.voice-orb-video:focus-visible {
+  outline: 3px solid var(--action);
+  outline-offset: 4px;
+}
+.voice-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.voice-orb-video.connecting .voice-video,
+.voice-orb-video.live .voice-video {
+  border-color: var(--action);
+}
+
 .voice-orb {
   position: relative;
   width: 150px;
@@ -2465,6 +2555,18 @@ html[data-contrast="high"] .alert-dialog {
   margin: 6px auto 20px;
   display: grid;
   place-items: center;
+  /* Now a tappable button: strip the native chrome, keep the layout above. */
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.voice-orb:focus-visible {
+  outline: 3px solid var(--action);
+  outline-offset: 6px;
+  border-radius: 50%;
 }
 /* Two halo layers share one conic sweep (violet → indigo → blue → cyan); they sit
    BEHIND the opaque core (earlier siblings), so only the glowing rim shows. */
@@ -2576,6 +2678,51 @@ html[data-contrast="high"] .alert-dialog {
     opacity: 1;
   }
 }
+/* Voice animation: concentric sound-wave ripples that expand and fade outward
+   from the mic while connecting / live. Three staggered rings read as speech
+   radiating out. Hidden (opacity:0) at idle; behind the core (no z-index). */
+.voice-orb-wave {
+  position: absolute;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 2px solid rgba(130, 175, 255, 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+.voice-orb.live .voice-orb-wave,
+.voice-orb.connecting .voice-orb-wave {
+  animation: orb-wave 2.4s ease-out infinite;
+}
+.voice-orb.live .voice-orb-wave:nth-child(4),
+.voice-orb.connecting .voice-orb-wave:nth-child(4) {
+  animation-delay: 0.8s;
+}
+.voice-orb.live .voice-orb-wave:nth-child(5),
+.voice-orb.connecting .voice-orb-wave:nth-child(5) {
+  animation-delay: 1.6s;
+}
+/* Connecting = quicker, tighter waves */
+.voice-orb.connecting .voice-orb-wave {
+  animation-duration: 1.4s;
+}
+@keyframes orb-wave {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  70% {
+    opacity: 0.12;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+/* High-contrast: crisp bright ring instead of the soft blue */
+html[data-contrast="high"] .voice-orb-wave {
+  border-color: #eaf6ff;
+}
 /* High-contrast: drop the blur/bloom for a crisp solid rim + defined orb so
    low-vision users get a sharp shape, not a haze. */
 html[data-contrast="high"] .voice-orb-ring {
@@ -2630,7 +2777,8 @@ html[data-contrast="high"] .voice-orb-core {
   .voice-orb-ring,
   .voice-orb-core,
   .voice-orb-mic,
-  .voice-orb-arc {
+  .voice-orb-arc,
+  .voice-orb-wave {
     animation: none !important;
   }
 }

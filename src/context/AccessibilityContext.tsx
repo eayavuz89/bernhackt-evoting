@@ -158,6 +158,10 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         u.onerror = fire;
       }
       window.speechSynthesis.speak(u);
+      // Chrome/Safari can leave the engine in a "paused" state right after a
+      // cancel(), which silently swallows the next utterance. resume() un-pauses
+      // it; it's a no-op when not paused, so it's always safe to call.
+      window.speechSynthesis.resume();
     },
     [lang]
   );

@@ -45,9 +45,14 @@ export default function ProfileSelect() {
           <Link className="btn btn-ghost btn-lg" to="/card">
             {a.tr("openCard")}
           </Link>
-          <button type="button" className="btn btn-ghost btn-lg" onClick={() => setPracticeOpen(true)}>
-            <span aria-hidden="true">🎯</span> {a.tr("practice.open")}
-          </button>
+          {/* Practice is a comprehension aid — only surfaced for the profiles that
+              benefit most (Einfache Sprache + Grosse Ansicht). Hidden otherwise,
+              so the remaining CTAs centre on their own. */}
+          {(a.profile === "cognitive" || a.profile === "senior") && (
+            <button type="button" className="btn btn-ghost btn-lg" onClick={() => setPracticeOpen(true)}>
+              <span aria-hidden="true">🎯</span> {a.tr("practice.open")}
+            </button>
+          )}
         </div>
       </Screen>
       {practiceOpen && <PracticeMode onClose={() => setPracticeOpen(false)} />}

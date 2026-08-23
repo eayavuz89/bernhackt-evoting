@@ -17,7 +17,7 @@ export default function Verify({ session }: { session: Session }) {
   }, []);
 
   return (
-    <Screen title={a.tr("verifyTitle")} help={a.tr("verifyHelp")} step={3} totalSteps={4}>
+    <Screen title={a.tr("verifyTitle")} help={a.tr("verifyHelp")} step={3} totalSteps={4} easySym="🔢">
       <ul className="verify-list" role="list">
         {PROPOSALS.map((p, idx) => {
           const ans = session.answers[p.id];

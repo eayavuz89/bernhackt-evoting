@@ -11,11 +11,13 @@ import { useVoiceCommands } from "../lib/useVoiceCommands";
 // Blind-first & keyboard-first throughout: focus-trapped role="dialog", the
 // heading is focused on every page (screen readers announce it), each page is
 // narrated when read-aloud is on, and hands-free voice commands move around.
+// One icon per process step, matched to the action: sign in (card), answer the
+// proposals (ballot), encrypt & verify (lock), confirm (check), done (celebrate).
 const GUIDE = [
   { title: "guide.s1.title", body: "guide.s1.body", icon: "🪪" },
   { title: "guide.s2.title", body: "guide.s2.body", icon: "🗳️" },
-  { title: "guide.s3.title", body: "guide.s3.body", icon: "🔢" },
-  { title: "guide.s4.title", body: "guide.s4.body", icon: "🔒" },
+  { title: "guide.s3.title", body: "guide.s3.body", icon: "🔒" },
+  { title: "guide.s4.title", body: "guide.s4.body", icon: "✅" },
   { title: "guide.s5.title", body: "guide.s5.body", icon: "🎉" },
 ];
 
@@ -97,7 +99,9 @@ export default function OnboardingTour({
     });
   };
   const startAudio = () => {
-    a.stopSpeak();
+    // No separate stopSpeak() here: a.speak() already cancels any current speech.
+    // A redundant cancel() right before speak() triggers a Chrome/Safari race that
+    // drops the utterance ("Alles vorlesen" appeared to do nothing).
     audioActiveRef.current = true;
     setAudioMode(true);
     playAudio(0);
@@ -234,6 +238,10 @@ export default function OnboardingTour({
         aria-describedby={bodyId}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Welcome phase only: brand logo centred on top of the first-open card. */}
+        {!isGuide && !audioMode && (
+          <img className="tour-logo" src="/logo.png" alt="" aria-hidden="true" />
+        )}
         <div className="tour-head">
           <span className="tour-eyebrow">{a.tr("tutorial.label")}</span>
           <button
@@ -279,8 +287,10 @@ export default function OnboardingTour({
             </div>
 
             {/* key={page} remounts the page so the page-turn animation replays */}
-            {/* Guide is text + audio for everyone now — decorative step emoji removed. */}
             <div className="tour-body tour-page" key={page}>
+              <span className="tour-icon" aria-hidden="true">
+                {GUIDE[page].icon}
+              </span>
               <h2 id={titleId} ref={headingRef} tabIndex={-1} className="tour-title">
                 {a.tr(GUIDE[page].title)}
               </h2>

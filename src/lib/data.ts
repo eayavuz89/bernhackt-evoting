@@ -1,6 +1,8 @@
 import { Lang } from "./i18n";
 
-// Mock ballot data. No backend — the challenge explicitly allows static/random codes.
+// Mock ballot data. No backend — the challenge explicitly allows static/random
+// codes. The per-option return codes below are taken from the reference voting
+// card (Demo Abstimmung / Variantenabstimmung), read top-to-bottom.
 export interface Proposal {
   id: string;
   title: Record<Lang, string>;
@@ -24,7 +26,7 @@ export const PROPOSALS: Proposal[] = [
       it: "Volete accettare l'iniziativa?",
       en: "Do you want to accept the initiative?",
     },
-    codes: { yes: "1855", no: "0196", blank: "7064" },
+    codes: { yes: "5395", no: "7819", blank: "4166" },
   },
   {
     id: "p2",
@@ -40,7 +42,7 @@ export const PROPOSALS: Proposal[] = [
       it: "Volete accettare la modifica di legge?",
       en: "Do you want to accept the legal amendment?",
     },
-    codes: { yes: "8393", no: "2938", blank: "2033" },
+    codes: { yes: "8818", no: "7601", blank: "0507" },
   },
   {
     id: "p3",
@@ -56,7 +58,7 @@ export const PROPOSALS: Proposal[] = [
       it: "Volete accettare l'oggetto?",
       en: "Do you want to accept the proposal?",
     },
-    codes: { yes: "9697", no: "9131", blank: "7973" },
+    codes: { yes: "7360", no: "2603", blank: "2037" },
   },
 ];
 

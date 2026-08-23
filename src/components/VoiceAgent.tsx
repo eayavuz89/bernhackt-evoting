@@ -18,6 +18,7 @@ export default function VoiceAgent() {
   const [open, setOpen] = useState(false);
   const [lines, setLines] = useState<Line[]>([]);
   const [needsUnlock, setNeedsUnlock] = useState(false); // autoplay blocked → user must tap
+  const [greeting, setGreeting] = useState(false); // demo: TTS welcome after tapping the orb
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
@@ -25,9 +26,38 @@ export default function VoiceAgent() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<number | null>(null);
+  const greetTimerRef = useRef<number | null>(null);
   const partial = useRef<{ user: string; assistant: string }>({ user: "", assistant: "" });
 
-  useEffect(() => () => hangup(), []); // cleanup on unmount
+  useEffect(
+    () => () => {
+      hangup();
+      if (greetTimerRef.current) clearTimeout(greetTimerRef.current);
+    },
+    []
+  ); // cleanup on unmount
+
+  // Tap the orb → after a ~1s beat the assistant greets by voice (browser TTS).
+  // Deterministic demo greeting; a live OpenAI realtime conversation still needs
+  // the backend token + key (that path lives in start(), untouched here).
+  function greet() {
+    if (greetTimerRef.current) clearTimeout(greetTimerRef.current);
+    a.stopSpeak();
+    setError("");
+    setGreeting(true);
+    greetTimerRef.current = window.setTimeout(() => {
+      a.speak(a.tr("voiceGreeting"), () => setGreeting(false));
+    }, 1000);
+  }
+
+  // Closing the panel stops the greeting (pending timer + any speech).
+  useEffect(() => {
+    if (open) return;
+    if (greetTimerRef.current) clearTimeout(greetTimerRef.current);
+    a.stopSpeak();
+    setGreeting(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   // Close the centered modal with Escape (focus/keyboard users).
   useEffect(() => {
@@ -246,9 +276,23 @@ export default function VoiceAgent() {
         className={"voice-fab" + (live ? " live" : "")}
         aria-expanded={open}
         aria-label={a.tr("voiceAssistant")}
-        onClick={() => (status === "idle" || status === "error" ? start() : setOpen((o) => !o))}
+        onClick={() => setOpen((o) => !o)}
       >
-        <span aria-hidden="true">🎙️</span>
+        {/* Clean line-art mic (matches the orb glyph) instead of the emoji */}
+        <svg
+          className="voice-fab-mic"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="2.5" width="6" height="11" rx="3" />
+          <path d="M6.5 11a5.5 5.5 0 0 0 11 0" />
+          <line x1="12" y1="16.5" x2="12" y2="20.5" />
+        </svg>
       </button>
 
       {open && (
@@ -261,48 +305,49 @@ export default function VoiceAgent() {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="voice-panel-head">
-            <span className={"voice-dot " + status} aria-hidden="true" />
+            <span className={"voice-dot " + (greeting ? "live" : status)} aria-hidden="true" />
             <strong>
-              {connecting ? a.tr("voiceConnecting") : live ? a.tr("voiceListening") : a.tr("voiceAssistant")}
+              {connecting
+                ? a.tr("voiceConnecting")
+                : live || greeting
+                ? a.tr("voiceListening")
+                : a.tr("voiceAssistant")}
             </strong>
             <button type="button" className="voice-x" onClick={() => setOpen(false)} aria-label={a.tr("close")}>
               ✕
             </button>
           </div>
 
-          {/* Voice orb — mic in a "listening" ring; rings ripple + accent arc
-              orbits while live */}
-          <div className={"voice-orb " + status} aria-hidden="true">
-            <span className="voice-orb-ring" />
-            <span className="voice-orb-ring" />
-            <span className="voice-orb-core">
-              <svg
-                className="voice-orb-mic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                {/* rounded stadium capsule + U-shaped stand + short stem (Siri-style) */}
-                <rect x="9" y="2.5" width="6" height="11" rx="3" />
-                <path d="M6.5 11a5.5 5.5 0 0 0 11 0" />
-                <line x1="12" y1="16.5" x2="12" y2="20.5" />
-              </svg>
-            </span>
-            <svg className="voice-orb-arc" viewBox="0 0 100 100" aria-hidden="true">
-              <circle cx="50" cy="50" r="46" />
-            </svg>
-          </div>
+          {/* AI-input animation ("Listening & Thinking") — tap to have the
+              assistant greet you by voice. The video is decorative (the button
+              carries the label); under reduced motion it stays on the still poster
+              frame instead of auto-playing. */}
+          <button
+            type="button"
+            className={"voice-orb-video " + (greeting ? "live" : status)}
+            onClick={greet}
+            aria-label={a.tr("voiceTapToStart")}
+          >
+            <video
+              className="voice-video"
+              src="/voice-assistant.mp4"
+              poster="/voice-assistant.webp"
+              autoPlay={!a.reducedMotion}
+              loop
+              muted
+              playsInline
+              aria-hidden="true"
+            />
+          </button>
 
           {error ? (
             <p className="voice-error" role="alert">
               ⚠️ {error}
             </p>
           ) : (
-            <p className="voice-hint">{live ? a.tr("voiceSpeakNow") : a.tr("voiceIntro")}</p>
+            <p className="voice-hint">
+              {greeting ? a.tr("voiceGreeting") : live ? a.tr("voiceSpeakNow") : a.tr("voiceIntro")}
+            </p>
           )}
 
           {needsUnlock && (
@@ -333,17 +378,6 @@ export default function VoiceAgent() {
             </div>
           )}
 
-          <div className="voice-actions">
-            {live || connecting ? (
-              <button type="button" className="btn btn-ghost" onClick={() => hangup()}>
-                ⏹ {a.tr("voiceStop")}
-              </button>
-            ) : (
-              <button type="button" className="btn btn-primary" onClick={start}>
-                🎙️ {a.tr("voiceStart")}
-              </button>
-            )}
-          </div>
         </div>
         </div>
       )}
