@@ -2900,3 +2900,42 @@ html[data-contrast="high"] .vt-assistant {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- QR camera scanner (Login) ---- */
+.scan-btn {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+.scan-ok {
+  color: var(--ok, #1a7f37);
+  font-weight: 600;
+}
+.dialog-scan {
+  max-width: 440px;
+  width: min(92vw, 440px);
+}
+.scan-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.scan-viewport video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.scan-frame {
+  position: absolute;
+  inset: 12%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+html[data-contrast="high"] .scan-frame {
+  border-color: #ffff00;
+}

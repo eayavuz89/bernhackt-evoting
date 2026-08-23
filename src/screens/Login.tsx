@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useA11y } from "../context/AccessibilityContext";
 import Screen from "../components/Screen";
+import QrScanner from "../components/QrScanner";
 import { CARD } from "../lib/data";
 
 // Official scheme: init code is alphanumeric, case-insensitive; the Extended
@@ -26,6 +27,8 @@ export default function Login() {
   // Legal-provisions reader dialog, opened from the info icon in the second
   // acknowledgement row.
   const [legalOpen, setLegalOpen] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scanned, setScanned] = useState(false); // brief "code taken over" confirmation
   const legalInfoBtnRef = useRef<HTMLButtonElement | null>(null);
   const legalCloseRef = useRef<HTMLButtonElement | null>(null);
 
@@ -189,8 +192,39 @@ export default function Login() {
           </Link>
         </div>
 
-        <p className="scan-note">📷 {a.tr("scanCardHelp")}</p>
+        {/* Camera QR sign-in: the card's QR deep-links to /login?init=<code>; we
+            accept both that URL and a raw code payload. */}
+        <button type="button" className="btn btn-ghost scan-btn" onClick={() => setScanOpen(true)}>
+          📷 {a.tr("scanQrBtn")}
+        </button>
+        {scanned && (
+          <p className="hint scan-ok" role="status">
+            ✅ {a.tr("scanQrSuccess")}
+          </p>
+        )}
       </form>
+
+      {scanOpen && (
+        <QrScanner
+          onClose={() => setScanOpen(false)}
+          onResult={(text) => {
+            let init = text.trim();
+            try {
+              const u = new URL(text);
+              init = u.searchParams.get("init") || init;
+            } catch {
+              /* raw code, not a URL */
+            }
+            setCode(init);
+            setScanOpen(false);
+            setScanned(true);
+            if (errorField === "code") {
+              setError("");
+              setErrorField("");
+            }
+          }}
+        />
+      )}
 
       {legalOpen && (
         <div className="dialog-backdrop" role="presentation" onClick={closeLegal}>
