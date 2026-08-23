@@ -47,6 +47,13 @@ einfache Sprache → "cognitive" · älter/grosse Schrift → "senior" · keine 
 "standard". Bestätige kurz, was du eingestellt hast, und führe die Person dann direkt weiter
 zur Anmeldung.
 
+KEINE EINSCHRÄNKUNG: Sagt die Person, sie habe keine Einschränkung, dann setze
+set_profile("standard") und verabschiede dich kurz, z. B.: "Alles klar — dann ziehe ich mich
+zurück und Sie machen einfach selbst weiter. Wenn Sie mich später brauchen, tippen Sie unten
+rechts auf das Mikrofon-Symbol." Rufe DANACH end_call auf, um das Gespräch zu beenden.
+Dasselbe gilt jederzeit, wenn die Person sagt, sie brauche keine Hilfe mehr oder verabschiedet
+sich: kurz verabschieden (mit Hinweis auf das Mikrofon unten rechts), dann end_call.
+
 WICHTIG: Du steuerst nur die Oberfläche über die Werkzeuge. Erfinde keine Codes oder Ergebnisse –
 nimm immer die Werte aus den Werkzeug-Antworten. Halte dich kurz.
 `.trim();
@@ -77,6 +84,13 @@ const tools = [
       required: ["profile"],
       additionalProperties: false,
     },
+  },
+  {
+    type: "function",
+    name: "end_call",
+    description:
+      "Das Sprachgespräch beenden (nachdem du dich verabschiedet hast). Nutzen, wenn die Person keine Einschränkung hat, keine Hilfe mehr braucht oder sich verabschiedet.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     type: "function",

@@ -31,6 +31,10 @@ export default function VoiceAgent() {
   // then asks the "are you blind / which impairment?" question and sets the
   // profile herself (set_profile tool) instead of the visual card doing it.
   const welcomeRef = useRef(false);
+  // Set when Vera calls end_call: we wait for her goodbye audio to finish
+  // playing (output_audio_buffer.stopped) before hanging up, with a timer as
+  // safety net in case that event never arrives.
+  const endPendingRef = useRef<number | null>(null);
 
   useEffect(() => () => hangup(), []); // cleanup on unmount
 
@@ -93,12 +97,25 @@ export default function VoiceAgent() {
       case "response.function_call_arguments.done":
         executeTool(evt.name, evt.call_id, evt.arguments);
         break;
+      // Vera said goodbye and asked to end: close once her audio finished playing.
+      case "output_audio_buffer.stopped":
+        if (endPendingRef.current !== null) endNow();
+        break;
       case "error":
         console.error("[voice] realtime error", evt.error);
         break;
       default:
         break;
     }
+  }
+
+  function endNow() {
+    if (endPendingRef.current !== null) {
+      clearTimeout(endPendingRef.current);
+      endPendingRef.current = null;
+    }
+    hangup();
+    setOpen(false);
   }
 
   function executeTool(name: string, callId: string, argsJson: string) {
@@ -108,6 +125,24 @@ export default function VoiceAgent() {
     } catch {
       /* ignore */
     }
+
+    // end_call is handled here, not by the app bridge: acknowledge it, then wait
+    // for the goodbye audio to finish (no response.create — the conversation is
+    // over). 12s timer covers browsers that never emit the stopped event.
+    if (name === "end_call") {
+      const dc0 = dcRef.current;
+      if (dc0 && dc0.readyState === "open") {
+        dc0.send(
+          JSON.stringify({
+            type: "conversation.item.create",
+            item: { type: "function_call_output", call_id: callId, output: JSON.stringify({ ok: true }) },
+          })
+        );
+      }
+      endPendingRef.current = window.setTimeout(endNow, 12_000);
+      return;
+    }
+
     const result = voiceBridge.run(name, args);
     const dc = dcRef.current;
     if (!dc || dc.readyState !== "open") return;
@@ -249,6 +284,10 @@ export default function VoiceAgent() {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
+    }
+    if (endPendingRef.current !== null) {
+      clearTimeout(endPendingRef.current);
+      endPendingRef.current = null;
     }
     dcRef.current?.close();
     dcRef.current = null;
