@@ -122,13 +122,13 @@ export default function App() {
         if (to === "back") target = STEP_ORDER[Math.max(0, (cur < 0 ? 0 : cur) - 1)].slice(1);
         const valid = ["login", "ballot", "verify", "confirm", "done"];
         if (!valid.includes(target)) return { error: "bad_target", to };
-        // Demo pacing: keep the login page on screen ≥5s so viewers see it —
+        // Demo pacing: keep the login page on screen ≥10s so viewers see it —
         // Vera keeps talking meanwhile, the page follows when the time is up.
         if (target === "ballot" && pathRef.current === "/login") {
-          const wait = Math.max(0, 5000 - (Date.now() - loginAtRef.current));
+          const wait = Math.max(0, 10_000 - (Date.now() - loginAtRef.current));
           if (wait > 0) {
             setTimeout(() => navigate("/ballot"), wait);
-            return { ok: true, step: target, note: "login_shown_5s_then_ballot" };
+            return { ok: true, step: target, note: "login_shown_10s_then_ballot" };
           }
         }
         navigate("/" + target);
