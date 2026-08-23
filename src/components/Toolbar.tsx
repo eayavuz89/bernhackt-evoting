@@ -72,6 +72,8 @@ export default function Toolbar({ onOpenTutorial }: { onOpenTutorial: () => void
         <button
           type="button"
           className="restart-btn"
+          aria-label={a.tr("startOver")}
+          title={a.tr("startOver")}
           onClick={() => {
             try {
               window.localStorage.removeItem(A11Y_STORAGE_KEY);
@@ -81,7 +83,9 @@ export default function Toolbar({ onOpenTutorial }: { onOpenTutorial: () => void
             window.location.href = "/";
           }}
         >
-          <span aria-hidden="true">↺</span> {a.tr("startOver")}
+          <span aria-hidden="true">↺</span>
+          {/* hidden on narrow screens — the icon + aria-label carry the meaning */}
+          <span className="restart-label">{a.tr("startOver")}</span>
         </button>
 
         <div className="a11y-wrap" ref={wrapRef}>

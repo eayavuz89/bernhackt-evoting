@@ -2964,10 +2964,28 @@ html[data-contrast="high"] .scan-frame {
 .restart-btn:hover {
   border-color: var(--ink);
 }
-@media (max-width: 560px) {
+.restart-btn .restart-label {
+  white-space: nowrap;
+}
+/* Narrow screens: icon-only restart + tighter header so nothing wraps or
+   pushes the accessibility menu off-screen. */
+@media (max-width: 760px) {
+  .toolbar-inner {
+    gap: 8px;
+    padding: 10px 12px;
+  }
   .restart-btn {
-    padding: 8px 10px;
-    font-size: 0.85rem;
+    padding: 8px 12px;
+    margin-right: 0;
+  }
+  .restart-btn .restart-label {
+    display: none;
+  }
+  .brand-logo {
+    height: 44px;
+  }
+  .a11y-trigger {
+    padding: 8px 12px;
   }
 }
 
