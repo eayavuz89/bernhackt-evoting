@@ -97,9 +97,15 @@ export default function VoiceAgent() {
         pushFinal("user", evt.transcript || partial.current.user);
         partial.current.user = "";
         break;
-      // tool calls
+      // tool calls — two event shapes cover API variations: arguments.done
+      // carries name in most cases; output_item.done always does. Deduped by
+      // call_id so a call never executes twice.
       case "response.function_call_arguments.done":
-        executeTool(evt.name, evt.call_id, evt.arguments);
+        if (evt.name) executeTool(evt.name, evt.call_id, evt.arguments);
+        break;
+      case "response.output_item.done":
+        if (evt.item?.type === "function_call")
+          executeTool(evt.item.name, evt.item.call_id, evt.item.arguments);
         break;
       // Vera said goodbye and asked to end: close once her audio finished playing.
       case "output_audio_buffer.stopped":
@@ -122,7 +128,12 @@ export default function VoiceAgent() {
     setOpen(false);
   }
 
+  const executedCallsRef = useRef<Set<string>>(new Set());
+
   function executeTool(name: string, callId: string, argsJson: string) {
+    if (callId && executedCallsRef.current.has(callId)) return; // already ran
+    if (callId) executedCallsRef.current.add(callId);
+    console.info("[voice] tool call", name, argsJson);
     let args: any = {};
     try {
       args = argsJson ? JSON.parse(argsJson) : {};
@@ -316,6 +327,7 @@ export default function VoiceAgent() {
       endPendingRef.current = null;
     }
     farewellStartedRef.current = false;
+    executedCallsRef.current.clear();
     dcRef.current?.close();
     dcRef.current = null;
     pcRef.current?.getSenders()?.forEach((s) => s.track?.stop());
