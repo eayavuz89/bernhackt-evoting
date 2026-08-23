@@ -25,13 +25,19 @@ damit die Person Codes ertasten/finden kann — hilf ihr damit:
 
 ABLAUF (nutze immer die Werkzeuge, rate nie den Zustand):
 1. Rufe get_state auf, um zu wissen, wo wir sind und was schon gewählt wurde.
-2. Bei der Anmeldung: Zeige die Seite zuerst mit go_to("login"). In dieser DEMO sind alle
-   Felder bereits ausgefüllt und die Erklärungen angehakt. Erkläre in EINEM Satz, dass hier
-   normalerweise der Code beim Dreieck ▲ plus das Geburtsjahr eingegeben würden, sage dann:
-   "Da dies eine Demo ist, betrachte ich die Anmeldung als ausgefüllt." und gehe DIREKT mit
-   go_to("ballot") zur Abstimmung weiter. Frage NICHT nach Code oder Geburtsjahr.
-3. Auf der Abstimmungsseite: Lies jede Vorlage vor (Nummer, Titel, Frage). Frage nach der
-   Antwort: Ja, Nein oder Leer. Setze sie mit set_answer. Fahre der Reihe nach fort.
+2. Bei der Anmeldung: Zeige die Seite zuerst mit go_to("login") und BLEIBE dort einen
+   Moment, damit die Person die Seite in Ruhe sehen kann. Erkläre gemächlich in zwei bis
+   drei Sätzen: die zwei rechtlichen Erklärungen oben sind bereits angehakt, der
+   Initialisierungscode steht beim Dreieck ▲ auf dem Stimmrechtsausweis, und dazu kommt das
+   Geburtsjahr als zweiter Faktor. Sage erst DANN: "Da dies eine Demo ist, betrachte ich
+   die Anmeldung als ausgefüllt." und gehe mit go_to("ballot") zur Abstimmung weiter.
+   Frage NICHT nach Code oder Geburtsjahr.
+3. Auf der Abstimmungsseite: Rufe VOR dem Vorlesen jeder Vorlage focus_proposal auf, damit
+   die Seite automatisch zur Vorlage scrollt. Lies dann Nummer, Titel und Frage vor und
+   frage nach der Antwort: Ja, Nein oder Leer. Setze sie mit set_answer. WICHTIG: Vorlage 3
+   ist in dieser Demo aus Zeitgründen bereits beantwortet — sage kurz: "Vorlage 3
+   überspringe ich aus Zeitgründen, sie ist bereits beantwortet." und behandle nur die
+   Vorlagen 1 und 2.
 4. Wenn alle Vorlagen beantwortet sind: Erkläre, dass die Stimme jetzt verschlüsselt und
    übermittelt wird und danach nicht mehr änderbar ist. Gehe mit go_to("verify") weiter.
 5. Auf der Prüfseite: Rufe read_codes auf und lies die Prüfcodes langsam vor. Erkläre, dass
@@ -110,6 +116,20 @@ const tools = [
         choice: { type: "string", enum: ["yes", "no", "blank"], description: "yes=Ja, no=Nein, blank=leer einlegen." },
       },
       required: ["proposal", "choice"],
+      additionalProperties: false,
+    },
+  },
+  {
+    type: "function",
+    name: "focus_proposal",
+    description:
+      "Die Abstimmungsseite zur genannten Vorlage scrollen. IMMER direkt vor dem Vorlesen einer Vorlage aufrufen, damit der Bildschirm der Stimme folgt.",
+    parameters: {
+      type: "object",
+      properties: {
+        proposal: { type: "integer", description: "Nummer der Vorlage, beginnend bei 1." },
+      },
+      required: ["proposal"],
       additionalProperties: false,
     },
   },

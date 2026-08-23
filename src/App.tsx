@@ -17,11 +17,23 @@ import type { Session } from "./lib/types";
 
 const STEP_ORDER = ["/login", "/ballot", "/verify", "/confirm", "/done"];
 
+// Smooth-scroll the ballot page to a proposal card. Delayed a tick so it also
+// works right after a navigate() while the ballot is still mounting.
+function scrollToProposal(n: number) {
+  setTimeout(() => {
+    document
+      .querySelector(`[data-proposal="${n}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 200);
+}
+
 export default function App() {
   const a = useA11y();
   const location = useLocation();
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  // Demo: proposal 3 arrives pre-answered — Vera announces she skips it for
+  // time and only walks through proposals 1 and 2.
+  const [answers, setAnswers] = useState<Record<string, Answer>>({ [PROPOSALS[2].id]: "yes" });
   // Visual tour no longer auto-opens: on first visit Vera greets directly
   // (below). Still re-openable from the a11y menu.
   const [tourOpen, setTourOpen] = useState(false);
@@ -84,7 +96,16 @@ export default function App() {
         if (!["yes", "no", "blank"].includes(choice)) return { error: "bad_choice", choice };
         setAnswers((prev) => ({ ...prev, [p.id]: choice }));
         if (pathRef.current !== "/ballot") navigate("/ballot");
+        scrollToProposal(proposal);
         return { ok: true, proposal, choice, title: p.title[a.lang] };
+      },
+      // Vera calls this right before reading a proposal aloud, so the page
+      // scrolls along with her voice.
+      focusProposal: (proposal) => {
+        if (!PROPOSALS[proposal - 1]) return { error: "no_such_proposal", proposal };
+        if (pathRef.current !== "/ballot") navigate("/ballot");
+        scrollToProposal(proposal);
+        return { ok: true, proposal };
       },
       goTo: (to) => {
         const cur = STEP_ORDER.indexOf(pathRef.current);

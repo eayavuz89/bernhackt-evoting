@@ -6,6 +6,7 @@ export interface VoiceHandlers {
   getState: () => any;
   setProfile: (profile: string) => any;
   setAnswer: (proposal: number, choice: "yes" | "no" | "blank") => any;
+  focusProposal: (proposal: number) => any;
   goTo: (to: string) => any;
   readCodes: () => any;
   castVote: () => any;
@@ -30,6 +31,10 @@ export const voiceBridge = {
         case "set_answer":
           return handlers.setAnswer
             ? handlers.setAnswer(Number(args?.proposal), args?.choice)
+            : { error: "unavailable" };
+        case "focus_proposal":
+          return handlers.focusProposal
+            ? handlers.focusProposal(Number(args?.proposal))
             : { error: "unavailable" };
         case "go_to":
           return handlers.goTo ? handlers.goTo(String(args?.to)) : { error: "unavailable" };

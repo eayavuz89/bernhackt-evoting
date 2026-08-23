@@ -84,6 +84,7 @@ export default function Ballot({ session }: { session: Session }) {
           <fieldset
             className={"proposal" + (invalid ? " invalid" : "")}
             aria-invalid={invalid || undefined}
+            data-proposal={idx + 1}
             key={p.id}
           >
             <legend className="proposal-legend">
