@@ -2939,3 +2939,6 @@ html[data-contrast="high"] .vt-assistant {
 html[data-contrast="high"] .scan-frame {
   border-color: #ffff00;
 }
+.scan-viewport video.mirrored {
+  transform: scaleX(-1);
+}

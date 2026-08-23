@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
 import { useA11y } from "../context/AccessibilityContext";
 
-// Camera QR scanner for the voting-card deep link. Opens the rear camera,
-// samples frames onto a canvas and decodes with jsQR (pure JS — works in every
-// browser, no BarcodeDetector dependency). Presented as a modal dialog with the
-// same semantics as the legal dialog: focus trap entry, Escape closes, status
+// Camera QR scanner for the voting-card deep link. Opens the rear camera by
+// default (a printed card is usually scanned with it), with a front/back flip
+// button — e.g. to scan a QR shown on another screen. Frames are sampled onto a
+// canvas and decoded with jsQR (pure JS — works in every browser, no
+// BarcodeDetector dependency). Presented as a modal dialog with the same
+// semantics as the legal dialog: focus trap entry, Escape closes, status
 // announced via aria-live for screen-reader users.
 export default function QrScanner({
   onResult,
@@ -21,13 +23,23 @@ export default function QrScanner({
   const rafRef = useRef<number>(0);
   const doneRef = useRef(false);
   const [error, setError] = useState("");
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
 
+  // Escape closes; focus starts on the close button.
   useEffect(() => {
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // (Re)start the camera whenever the facing direction changes.
+  useEffect(() => {
+    let cancelled = false;
+    setError("");
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
@@ -53,8 +65,12 @@ export default function QrScanner({
     };
 
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: "environment" } })
+      .getUserMedia({ video: { facingMode: facing } })
       .then((stream) => {
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
         streamRef.current = stream;
         const video = videoRef.current;
         if (!video) return;
@@ -63,6 +79,7 @@ export default function QrScanner({
         rafRef.current = requestAnimationFrame(tick);
       })
       .catch((e) => {
+        if (cancelled) return;
         setError(
           e?.name === "NotAllowedError" || e?.name === "SecurityError"
             ? a.tr("scanQrDenied")
@@ -71,12 +88,13 @@ export default function QrScanner({
       });
 
     return () => {
-      window.removeEventListener("keydown", onKey);
+      cancelled = true;
       cancelAnimationFrame(rafRef.current);
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [facing]);
 
   return (
     <div className="dialog-backdrop" role="presentation" onClick={onClose}>
@@ -91,14 +109,29 @@ export default function QrScanner({
           📷 {a.tr("scanQrTitle")}
         </h2>
         <div className="scan-viewport">
-          {/* muted+playsInline so mobile browsers allow inline autoplay */}
-          <video ref={videoRef} muted playsInline aria-hidden="true" />
+          {/* muted+playsInline so mobile browsers allow inline autoplay; mirror
+              the front camera preview like a native camera app */}
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            aria-hidden="true"
+            className={facing === "user" ? "mirrored" : undefined}
+          />
           <div className="scan-frame" aria-hidden="true" />
         </div>
         <p className="dialog-note" aria-live="polite">
           {error ? `⚠️ ${error}` : a.tr("scanQrHint")}
         </p>
         <div className="dialog-actions">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))}
+            aria-pressed={facing === "user"}
+          >
+            🔄 {facing === "environment" ? a.tr("scanQrFront") : a.tr("scanQrBack")}
+          </button>
           <button ref={closeRef} type="button" className="btn btn-primary" onClick={onClose}>
             {a.tr("close")}
           </button>
