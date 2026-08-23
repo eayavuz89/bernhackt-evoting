@@ -35,6 +35,9 @@ export default function VoiceAgent() {
   // playing (output_audio_buffer.stopped) before hanging up, with a timer as
   // safety net in case that event never arrives.
   const endPendingRef = useRef<number | null>(null);
+  // Guards the race where a previous utterance's audio "stopped" event arrives
+  // before the farewell even started: only close once farewell audio was heard.
+  const farewellStartedRef = useRef(false);
 
   useEffect(() => () => hangup(), []); // cleanup on unmount
 
@@ -80,6 +83,7 @@ export default function VoiceAgent() {
     switch (evt.type) {
       // live captions (deltas) — accessibility for deaf/hard-of-hearing users
       case "response.output_audio_transcript.delta":
+        if (endPendingRef.current !== null) farewellStartedRef.current = true;
         partial.current.assistant += evt.delta || "";
         break;
       case "response.output_audio_transcript.done":
@@ -99,7 +103,7 @@ export default function VoiceAgent() {
         break;
       // Vera said goodbye and asked to end: close once her audio finished playing.
       case "output_audio_buffer.stopped":
-        if (endPendingRef.current !== null) endNow();
+        if (endPendingRef.current !== null && farewellStartedRef.current) endNow();
         break;
       case "error":
         console.error("[voice] realtime error", evt.error);
@@ -126,9 +130,11 @@ export default function VoiceAgent() {
       /* ignore */
     }
 
-    // end_call is handled here, not by the app bridge: acknowledge it, then wait
-    // for the goodbye audio to finish (no response.create — the conversation is
-    // over). 12s timer covers browsers that never emit the stopped event.
+    // end_call is handled here, not by the app bridge. Models often emit the
+    // tool call without having spoken the goodbye yet — so we explicitly
+    // request one final farewell response, wait for its audio to finish
+    // (output_audio_buffer.stopped) and only then hang up. 15s timer covers
+    // browsers that never emit the stopped event.
     if (name === "end_call") {
       const dc0 = dcRef.current;
       if (dc0 && dc0.readyState === "open") {
@@ -138,8 +144,17 @@ export default function VoiceAgent() {
             item: { type: "function_call_output", call_id: callId, output: JSON.stringify({ ok: true }) },
           })
         );
+        dc0.send(
+          JSON.stringify({
+            type: "response.create",
+            response: {
+              instructions:
+                "Sprich JETZT deine kurze Verabschiedung passend zur Situation (falls die Stimmabgabe abgeschlossen ist: dass sie erfolgreich abgeschlossen ist, einen schönen Tag, alles Gute für die Schweiz; sonst ein kurzer Abschiedsgruss mit Hinweis auf das Mikrofon unten rechts). Rufe KEINE Werkzeuge mehr auf.",
+            },
+          })
+        );
       }
-      endPendingRef.current = window.setTimeout(endNow, 12_000);
+      endPendingRef.current = window.setTimeout(endNow, 15_000);
       return;
     }
 
@@ -296,6 +311,7 @@ export default function VoiceAgent() {
       clearTimeout(endPendingRef.current);
       endPendingRef.current = null;
     }
+    farewellStartedRef.current = false;
     dcRef.current?.close();
     dcRef.current = null;
     pcRef.current?.getSenders()?.forEach((s) => s.track?.stop());
